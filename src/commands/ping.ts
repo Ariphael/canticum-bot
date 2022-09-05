@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CacheType, ChatInputCommandInteraction } from 'discord.js';
 import { Command } from './command-interface';
 
 export const Ping: Command = {
@@ -10,5 +10,5 @@ export const Ping: Command = {
 };
 
 export const executePing = async (interaction: ChatInputCommandInteraction<CacheType>) => {
-  // TODO
+  await interaction.reply('Pong!');
 };
