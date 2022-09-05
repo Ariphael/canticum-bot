@@ -1,11 +1,7 @@
 import { Client } from "discord.js";
 
-export default (client: Client): void => {
-    client.on("ready", async () => {
-        if (!client.user || !client.application) {
-            return;
-        }
-
-        console.log(`Logged in as ${client.user.tag}`);
-    });
+export const handleReady = (client: Client): void => {
+  if (client.user !== null) {
+    console.log(`Ready! Logged in as ${client.user.tag}`);
+  }
 };

@@ -1,13 +1,15 @@
 import { Client } from "discord.js";
 import { token } from './config.json';
-import ready from "./listeners/ready";
+import { handleReady } from "./listeners/ready";
+import { handleSlashCommand } from "./listeners/interactionCreate";
 
 console.log("Bot is starting...");
 
 const client = new Client({
-    intents: []
+  intents: []
 });
 
-ready(client);
+client.once("ready", handleReady);
+client.on("interactionCreate", handleSlashCommand);
 
 client.login(token);
