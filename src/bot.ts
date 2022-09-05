@@ -1,5 +1,6 @@
 import { Client, GatewayIntentBits } from 'discord.js';
-import { token } from './config.json';
+// import { token } from './config.json';
+const token = "0123456789"; // fake token
 import { handleReady } from './listeners/ready';
 import { callbackSlashCommandFunction } from './listeners/interactionCreate';
 
