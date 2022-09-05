@@ -1,12 +1,17 @@
-import { Client } from "discord.js";
-import { token } from './config.json';
+import { Client, GatewayIntentBits } from 'discord.js';
+// import { token } from './config.json';
+const token = '0123456789'; // fake token
+import { handleReady } from './listeners/ready';
+import { callbackSlashCommandFunction } from './listeners/interactionCreate';
 
-console.log("Bot is starting...");
+console.log('Bot is starting...');
 
 const client = new Client({
-    intents: []
+  intents: [GatewayIntentBits.Guilds]
 });
 
-client.login(token);
+client.once('ready', handleReady);
 
-console.log(client);
+client.on('interactionCreate', callbackSlashCommandFunction);
+
+client.login(token);
