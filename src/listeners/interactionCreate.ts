@@ -1,20 +1,23 @@
-import { CacheType, Interaction } from 'discord.js';
-import { Commands } from '../commands/commands'
+import { CacheType, Interaction, ButtonInteraction, Client } from 'discord.js';
+import { Commands } from '../commands/commands';
 
-export const callbackSlashCommandFunction = async (interaction: Interaction<CacheType>) => {
-  if (interaction.isCommand() || interaction.isContextMenuCommand()) {
-    await doHandleSlashCommand(interaction);
-  }
+
+export const interactionCreate = (client: Client) => {
+  client.on('interactionCreate', async (interaction: Interaction<CacheType>) => {
+    if (interaction.isCommand() || interaction.isContextMenuCommand()) {
+      await doHandleSlashCommand(client, interaction);
+    }
+  });
 }
 
-const doHandleSlashCommand = async (interaction: Interaction<CacheType>): Promise<void> => {
+const doHandleSlashCommand = async (client: Client, interaction: Interaction<CacheType>): Promise<void> => {
   if (!interaction.isChatInputCommand()) return;   
 
   const slashCommand = Commands.find(c => c.name === interaction.commandName);
   if (!slashCommand) {
-    await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+    await interaction.reply({ content: "An error has occurred!", ephemeral: true });
     return;
   }
 
-  slashCommand.run(interaction);
+  slashCommand.run(client, interaction);
 }
