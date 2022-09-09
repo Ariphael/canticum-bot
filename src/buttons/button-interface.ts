@@ -1,8 +1,6 @@
 import { 
-  CacheType, 
   ActionRowBuilder, 
-  ButtonBuilder, 
-  ButtonInteraction, 
+  ButtonBuilder,  
   GuildTextBasedChannel
 } from 'discord.js';
 

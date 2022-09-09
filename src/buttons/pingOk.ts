@@ -21,13 +21,12 @@ export const pingOk: Button = {
       .setLabel('Ok')
       .setStyle(ButtonStyle.Primary),
   ), 
-  handleInteraction: async (channel: GuildTextBasedChannel) => {
+  handleInteraction: async (channel: GuildTextBasedChannel): Promise<void> => {
     await executePingOk(channel);
   }
 };
 
-const executePingOk = async (channel: GuildTextBasedChannel) => {
-  // await interaction.editReply({ content: 'You clicked Ok!', components: [] });
+export const executePingOk = async (channel: GuildTextBasedChannel): Promise<void> => {
   const filter: CollectorFilter<[ButtonInteraction<"cached">]> = 
     ( i: MessageComponentInteraction<CacheType> ) => i.customId === buttonId;
 
