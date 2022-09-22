@@ -9,3 +9,8 @@ export interface Button {
   row: ActionRowBuilder<ButtonBuilder>,
   handleInteraction: (channel: GuildTextBasedChannel) => void
 };
+
+export interface HelpPageInfo {
+  page: number, 
+  maxPage: number,
+};
