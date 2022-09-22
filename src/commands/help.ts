@@ -1,7 +1,6 @@
 import { Command } from './command-interface';
 import { embeds, getCommandEmbed } from '../embeds/helpEmbeds';
-import { prevButtonId, nextButtonId } from '../buttons/help.buttons';
-import { buttons } from '../buttons/buttons';
+import { buttons, helpButtonId } from '../buttons/buttons';
 import { 
   ApplicationCommandOptionType, 
   CacheType, 
@@ -32,13 +31,10 @@ export const executeHelp = async (_client: Client, interaction: ChatInputCommand
     await interaction.editReply({ content: '', components: [], embeds: [commandEmbed]});
     return;
   } 
-  const prevButton = buttons.find(b => b.buttonId === prevButtonId);
-  const nextButton = buttons.find(b => b.buttonId === nextButtonId);
-  const prevRow = prevButton.row;
-  const nextRow = nextButton.row;
   
-  prevButton.handleInteraction(interaction.channel);
-  nextButton.handleInteraction(interaction.channel);
+  const helpButton = buttons.find(b => b.buttonId = helpButtonId);
 
-  await interaction.editReply({ content: '', components: [prevRow, nextRow], embeds: [embeds[0]] });
+  helpButton.handleInteraction(interaction.channel);
+
+  await interaction.editReply({ content: '', components: [helpButton.row], embeds: [embeds[0]] });
 };
