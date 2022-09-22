@@ -1,5 +1,6 @@
 import { Button, HelpPageInfo } from './button-interface';
 import { numPages, embeds } from '../embeds/helpEmbeds';
+import { prevButtonId, nextButtonId, helpButtonId } from './buttons';
 import { 
   ActionRowBuilder, 
   CacheType, 
@@ -11,9 +12,6 @@ import {
   MessageComponentInteraction
 } from 'discord.js';
 
-export const prevButtonId = 'helpPrev';
-export const nextButtonId = 'helpNext';
-export const helpButtonId = 'helpButtons';
 const pageInfo: HelpPageInfo = {
   page: 1, 
   maxPage: numPages,
@@ -45,6 +43,30 @@ export const helpButtons: Button = {
   }
 }
 
+export const updateButtonMessage = async (components: ButtonBuilder[], pageInfo: HelpPageInfo, i: MessageComponentInteraction<CacheType>) => {
+  const prevButtonComponent = components[0]; 
+  const nextButtonComponent = components[1];
+
+  if (i.customId === prevButtonId) {
+    pageInfo.page -= 1;
+    nextButtonComponent.setDisabled(false);
+    if (pageInfo.page === 1) {
+      prevButtonComponent.setDisabled(true);
+    }
+  } else if (i.customId === nextButtonId) {
+    pageInfo.page += 1; 
+    prevButtonComponent.setDisabled(false);
+    if (pageInfo.page === pageInfo.maxPage) {
+      nextButtonComponent.setDisabled(true);
+    }
+  }
+  await i.update({ 
+    content: '', 
+    components: [helpButtonRow], 
+    embeds: [embeds[pageInfo.page - 1]] 
+  });
+}
+
 export const executeHelpButton = async (components: ButtonBuilder[], pageInfo: HelpPageInfo, channel: GuildTextBasedChannel) => {
   const filter: CollectorFilter<[ButtonInteraction<"cached">]> = (
     ( i: MessageComponentInteraction<CacheType> ) => {
@@ -54,24 +76,7 @@ export const executeHelpButton = async (components: ButtonBuilder[], pageInfo: H
   
   const collector = channel.createMessageComponentCollector({ filter, time: 60000 });
 
-  const prevButtonComponent = components[0]; 
-  const nextButtonComponent = components[1];
-
   collector.on('collect', async (i: MessageComponentInteraction<CacheType>) => {
-    if (i.customId === prevButtonId) {
-      pageInfo.page -= 1;
-      nextButtonComponent.setDisabled(false);
-      if (pageInfo.page === 1) {
-        prevButtonComponent.setDisabled(true);
-      }
-    } else if (i.customId === nextButtonId) {
-      pageInfo.page += 1; 
-      prevButtonComponent.setDisabled(false);
-      if (pageInfo.page === pageInfo.maxPage) {
-        nextButtonComponent.setDisabled(true);
-      }
-    }
+    await updateButtonMessage(components, pageInfo, i);
   });
-
-  collector.on('end', collected => console.log(`Collected ${collected.size} items`));
 };
