@@ -1,5 +1,5 @@
-import { executeHelpButton } from '../buttons/help.buttons';
-import { prevButtonId, nextButtonId } from '../buttons/help.buttons';
+import * as helpButtonsFile from '../buttons/help.buttons';
+import { prevButtonId, nextButtonId } from '../buttons/buttons';
 import { Button, HelpPageInfo } from '../buttons/button-interface';
 import { 
   Awaitable,
@@ -14,13 +14,15 @@ import {
 type interactionCollectorType = InteractionCollector<ButtonInteraction<CacheType> |
                                 SelectMenuInteraction<CacheType>>;
 
-describe('executePrevButton', () => {
+describe('helpButtonsFile.executeHelpButton', () => {
   const iPrevButton = ({
     customId: prevButtonId,
+    update: jest.fn(),
   } as unknown) as MessageComponentInteraction<CacheType>;
 
   const iNextButton = ({
     customId: nextButtonId,
+    update: jest.fn(),
   } as unknown) as MessageComponentInteraction<CacheType>;
 
   const interactionCollector = ({
@@ -52,7 +54,7 @@ describe('executePrevButton', () => {
       page: 1, 
       maxPage: 1,
     } as unknown) as HelpPageInfo;
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
+    helpButtonsFile.executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
     expect(guildTextBasedChannel.createMessageComponentCollector).toHaveBeenCalledTimes(1);
     expect(guildTextBasedChannel.createMessageComponentCollector)
       .toHaveBeenCalledWith(expect.objectContaining({ filter: expect.any(Function) }));
@@ -65,10 +67,57 @@ describe('executePrevButton', () => {
       page: 1, 
       maxPage: 1,
     } as unknown) as HelpPageInfo;
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    expect(interactionCollector.on).toHaveBeenCalledTimes(2);
+    helpButtonsFile.executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
+    expect(interactionCollector.on).toHaveBeenCalledTimes(1);
     expect(interactionCollector.on).toHaveBeenNthCalledWith(1, 'collect', expect.any(Function));
-    expect(interactionCollector.on).toHaveBeenNthCalledWith(2, 'end', expect.any(Function));
+  });
+
+  test('calls helpButtonsFile.updateButtonMessage with correct args', () => {
+    const pageInfo = ({
+      page: 2, 
+      maxPage: 3,
+    } as unknown) as HelpPageInfo;
+
+    jest
+      .spyOn(interactionCollector, 'on')
+      .mockImplementationOnce(
+        (eventStr: string, callback): interactionCollectorType => {
+          callback(iNextButton);
+          return interactionCollector;
+        }
+      );
+    
+    jest.spyOn(helpButtonsFile, "updateButtonMessage");
+
+    helpButtonsFile.executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
+    expect(helpButtonsFile.updateButtonMessage).toBeCalledTimes(1);
+    expect(helpButtonsFile.updateButtonMessage).toBeCalledWith(helpButtons.row.components, pageInfo, iNextButton);  
+  })
+});
+
+describe('helpButtonsFile.updateButtonMessage', () => {
+  const iPrevButton = ({
+    customId: prevButtonId,
+    update: jest.fn(),
+  } as unknown) as MessageComponentInteraction<CacheType>;
+
+  const iNextButton = ({
+    customId: nextButtonId,
+    update: jest.fn(),
+  } as unknown) as MessageComponentInteraction<CacheType>;
+
+  const helpButtons = ({
+    row: {
+      components: [{
+        setDisabled: jest.fn(),
+      }, {
+        setDisabled: jest.fn(),
+      }]
+    }
+  } as unknown) as Button;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   test('increments page count by 1 when next button is pressed', () => {
@@ -79,19 +128,8 @@ describe('executePrevButton', () => {
 
     const pageNum = pageInfo.page;
 
-    jest
-      .spyOn(interactionCollector, 'on')
-      .mockImplementation(
-        (_eventStr: string, callback): interactionCollectorType => {
-          callback(iNextButton);
-          return interactionCollector;
-        }
-      );
-
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel);   
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iNextButton);   
     expect(pageInfo.page).toBe(pageNum + 1);
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    expect(pageInfo.page).toBe(pageNum + 2);
   });
 
   test('enables prev button when next button is pressed', () => {
@@ -100,49 +138,31 @@ describe('executePrevButton', () => {
       maxPage: 3,
     } as unknown) as HelpPageInfo;
 
-    jest
-      .spyOn(interactionCollector, 'on')
-      .mockImplementationOnce(
-        (eventStr: string, callback): interactionCollectorType => {
-          callback(iNextButton);
-          return interactionCollector;
-        }
-      );
-    
-    jest.spyOn(helpButtons.row.components[0], 'setDisabled');
+    const prevButtonComponent = helpButtons.row.components[0];
 
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    expect(helpButtons.row.components[0].setDisabled).toBeCalledTimes(1); 
-    expect(helpButtons.row.components[0].setDisabled).toBeCalledWith(false);
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iNextButton); 
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iNextButton); 
+    expect(prevButtonComponent.setDisabled).toBeCalledTimes(2);
+    expect(prevButtonComponent.setDisabled).toBeCalledWith(false);
   });
 
-  test('next button is disabled on last page', () => {
+  test('disables next button on last page', () => {
     const pageInfo = ({
       page: 1, 
       maxPage: 3,
     } as unknown) as HelpPageInfo;
 
-    jest
-      .spyOn(interactionCollector, 'on')
-      .mockImplementation(
-        (eventStr: string, callback): interactionCollectorType => {
-          callback(iNextButton);
-          return interactionCollector;
-        }
-      );
-    
-    jest.spyOn(helpButtons.row.components[0], 'setDisabled');
-    jest.spyOn(helpButtons.row.components[1], 'setDisabled');
+    const pageNum = pageInfo.page;
+    const nextButtonComponent = helpButtons.row.components[1];
 
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    expect(helpButtons.row.components[0].setDisabled).toBeCalledTimes(2); 
-    expect(helpButtons.row.components[0].setDisabled).toBeCalledWith(false);  
-    expect(helpButtons.row.components[1].setDisabled).toBeCalledTimes(1); 
-    expect(helpButtons.row.components[1].setDisabled).toBeCalledWith(true);  
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iNextButton);
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iNextButton);   
+
+    expect(nextButtonComponent.setDisabled).toBeCalledTimes(1);
+    expect(nextButtonComponent.setDisabled).toBeCalledWith(true);
   });
 
-  test('decrements page count by 1 when prev button is pressed', () => {
+  test('decrements page count when prev button is pressed', () => {
     const pageInfo = ({
       page: 3, 
       maxPage: 3,
@@ -150,19 +170,8 @@ describe('executePrevButton', () => {
 
     const pageNum = pageInfo.page;
 
-    jest
-      .spyOn(interactionCollector, 'on')
-      .mockImplementation(
-        (eventStr: string, callback): interactionCollectorType => {
-          callback(iPrevButton);
-          return interactionCollector;
-        }
-      );
-
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel);     
-    expect(pageInfo.page).toBe(pageNum - 1);
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    expect(pageInfo.page).toBe(pageNum - 2);    
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iPrevButton);   
+    expect(pageInfo.page).toBe(pageNum - 1);    
   });
 
   test('enables next button when prev button is pressed', () => {
@@ -171,20 +180,12 @@ describe('executePrevButton', () => {
       maxPage: 3,
     } as unknown) as HelpPageInfo;
 
-    jest
-      .spyOn(interactionCollector, 'on')
-      .mockImplementationOnce(
-        (eventStr: string, callback): interactionCollectorType => {
-          callback(iPrevButton);
-          return interactionCollector;
-        }
-      );
-    
-    jest.spyOn(helpButtons.row.components[1], 'setDisabled');
+    const nextButtonComponent = helpButtons.row.components[1];
 
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    expect(helpButtons.row.components[1].setDisabled).toBeCalledTimes(1); 
-    expect(helpButtons.row.components[1].setDisabled).toBeCalledWith(false);
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iPrevButton); 
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iPrevButton); 
+    expect(nextButtonComponent.setDisabled).toBeCalledTimes(2);
+    expect(nextButtonComponent.setDisabled).toBeCalledWith(false);    
   });
 
   test('disables prev button on first page', () => {
@@ -193,22 +194,31 @@ describe('executePrevButton', () => {
       maxPage: 3,
     } as unknown) as HelpPageInfo;
 
-    jest
-      .spyOn(interactionCollector, 'on')
-      .mockImplementationOnce(
-        (eventStr: string, callback): interactionCollectorType => {
-          callback(iPrevButton);
-          return interactionCollector;
-        }
-      );
+    const prevButtonComponent = helpButtons.row.components[0]; 
     
-    jest.spyOn(helpButtons.row.components[1], 'setDisabled');
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iPrevButton); 
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iPrevButton); 
+    expect(prevButtonComponent.setDisabled).toBeCalledTimes(1); 
+    expect(prevButtonComponent.setDisabled).toBeCalledWith(true);
+  });
 
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    executeHelpButton(helpButtons.row.components, pageInfo, guildTextBasedChannel); 
-    expect(helpButtons.row.components[1].setDisabled).toBeCalledTimes(2); 
-    expect(helpButtons.row.components[1].setDisabled).toBeCalledWith(false);
-    expect(helpButtons.row.components[0].setDisabled).toBeCalledTimes(1); 
-    expect(helpButtons.row.components[0].setDisabled).toBeCalledWith(true);
+  test('calls i.update (prev button pressed)', () => {
+    const pageInfo = ({
+      page: 3, 
+      maxPage: 3,
+    } as unknown) as HelpPageInfo; 
+    
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iPrevButton);
+    expect(iPrevButton.update).toBeCalledTimes(1);    
+  });
+
+  test('calls i.update (next button pressed)', () => {
+    const pageInfo = ({
+      page: 1, 
+      maxPage: 3,
+    } as unknown) as HelpPageInfo;
+    
+    helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iNextButton);
+    expect(iNextButton.update).toBeCalledTimes(1);    
   });
 });
