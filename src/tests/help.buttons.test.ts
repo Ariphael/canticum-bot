@@ -222,3 +222,23 @@ describe('helpButtonsFile.updateButtonMessage', () => {
     expect(iNextButton.update).toBeCalledTimes(1);    
   });
 });
+
+describe('helpButtons', () => {
+  const interactionCollector = ({
+    on: jest.fn(),
+  } as unknown) as interactionCollectorType;
+
+  const guildTextBasedChannel = ({
+    createMessageComponentCollector: jest.fn(() => {
+      return interactionCollector;
+    }), 
+  } as unknown) as GuildTextBasedChannel;
+
+  test('handleInteraction calls executeHelpButtons', () => {
+    jest.spyOn(helpButtonsFile.helpButtons, 'handleInteraction');
+    jest.spyOn(helpButtonsFile, 'executeHelpButton')
+
+    helpButtonsFile.helpButtons.handleInteraction(guildTextBasedChannel);
+    expect(helpButtonsFile.executeHelpButton).toBeCalledTimes(1);
+  });
+});
