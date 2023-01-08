@@ -1,12 +1,11 @@
 import { Command } from './command-interface';
 import { buttons } from '../buttons/buttons';
-import { buttonId } from '../buttons/pingOk';
+import { pingOkButtonId } from '../buttons/buttonIdData.json';
 import { 
   CacheType, 
   ChatInputCommandInteraction, 
   Client,
   EmbedBuilder,
-  messageLink
 } from 'discord.js';
 
 export const Ping: Command = {
@@ -18,7 +17,7 @@ export const Ping: Command = {
 };
 
 export const executePing = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
-  const button = buttons.find(b => b.buttonId === buttonId);
+  const button = buttons.find(b => b.buttonId === pingOkButtonId);
   const row = button.row;
   
   button.handleInteraction(interaction.channel);

@@ -1,49 +1,18 @@
 import { doHandleSlashCommand } from '../listeners/interactionCreate';
-import { Command } from '../commands/command-interface';
-import { CacheType, Interaction, ButtonInteraction, Client, ChatInputCommandInteraction } from 'discord.js';
-import { executePing } from '../commands/ping';
+import { getInteraction } from '../mocks/interactionCreate.listener.mocks';
+import { 
+  getClientMock, 
+  getInteractionNotChatInputCommandMock, 
+  getSlashCommandMock 
+} from '../mocks/mocks';
 
 describe('interactionCreate listener tests', () => {
-  const interactionNotChatInputCommand = ({
-    reply: jest.fn(),
-    commandName: String,
-    isChatInputCommand: jest.fn(() => {
-      return false;
-    })
-  } as unknown) as ButtonInteraction<CacheType>;
-
-  const interaction = ({
-    reply: jest.fn(),
-    commandName: String,
-    isChatInputCommand: jest.fn(() => {
-      return true;
-    })
-  } as unknown) as ChatInputCommandInteraction<CacheType>;
-
-  const client = ({
-    intents: [],
-    ws: {
-      ping: Number,
-    }
-  } as unknown) as Client;
-
-  const slashCommandA = ({
-    name: String, 
-    description: String, 
-    run: jest.fn(),
-  } as unknown) as Command;
-
-  const slashCommandB = ({
-    name: String, 
-    description: String, 
-    run: jest.fn(),
-  } as unknown) as Command;
-
-  const slashCommandC = ({
-    name: String, 
-    description: String, 
-    run: jest.fn(),
-  } as unknown) as Command;
+  const interactionNotChatInputCommand = getInteractionNotChatInputCommandMock();
+  const interaction = getInteraction();
+  const client = getClientMock();
+  const slashCommandA = getSlashCommandMock();
+  const slashCommandB = getSlashCommandMock();
+  const slashCommandC = getSlashCommandMock();
 
   beforeEach(() => {
     jest.clearAllMocks();

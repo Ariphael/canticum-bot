@@ -1,28 +1,14 @@
-import { pingOk, executePingOk, buttonId } from '../buttons/pingOk';
+import { pingOk, executePingOk } from '../buttons/pingOk';
 import { 
-  ButtonInteraction, 
-  CacheType, 
-  CollectorFilter, 
-  GuildTextBasedChannel, 
-  InteractionCollector, 
-  MessageComponentInteraction, 
-  SelectMenuInteraction 
-} from 'discord.js';
+  getInteractionCollectorMock, 
+  getGuildTextBasedChannelMock, 
+  getMessageComponentInteractionMock 
+} from '../mocks/mocks';
 
 describe('pingOk Button Tests', () => {
-  const messageComponentInteraction = ({
-    update: jest.fn(),
-  } as unknown) as MessageComponentInteraction<CacheType>;
-
-  const interactionCollector = ({
-    on: jest.fn(),
-  } as unknown) as  InteractionCollector<SelectMenuInteraction<CacheType> | ButtonInteraction<CacheType>>;
-  
-  const channel = ({
-    createMessageComponentCollector: jest.fn(() => { 
-      return interactionCollector; 
-    }),
-  } as unknown) as GuildTextBasedChannel;
+  const messageComponentInteraction = getMessageComponentInteractionMock();
+  const interactionCollector = getInteractionCollectorMock();
+  const channel = getGuildTextBasedChannelMock(interactionCollector);
 
   test('correctly calls createMessageComponentCollector (executePingOk called directly)', async () => {
     await executePingOk(channel);

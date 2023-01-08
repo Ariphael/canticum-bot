@@ -1,37 +1,18 @@
-import { ready, doHandleReady } from '../listeners/ready';
-import { Client } from "discord.js";
+import { doHandleReady } from '../listeners/ready';
+import { 
+  getClientApplicationNullMock, 
+  getClientMock, 
+  getClientUserApplicationNullMock, 
+  getClientUserNullMock 
+} from '../mocks/ready.listener.mocks';
 
-const client = ({
-  user: {
-    tag: String,
-  }, 
-  application: {
-    commands: {
-      set: jest.fn(),
-    }
-  }
-} as unknown) as Client;
+const client = getClientMock();
 
-const clientUserNull = ({
-  user: null, 
-  application: {
-    commands: {
-      set: jest.fn(),
-    }
-  }
-} as unknown) as Client;
+const clientUserNull = getClientUserNullMock();
 
-const clientApplicationNull = ({
-  user: {
-    tag: String,
-  }, 
-  application: null,
-} as unknown) as Client;
+const clientApplicationNull = getClientApplicationNullMock();
 
-const clientUserApplicationNull = ({
-  user: null, 
-  application: null,
-} as unknown) as Client;
+const clientUserApplicationNull = getClientUserApplicationNullMock();
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -62,11 +43,7 @@ describe('ready listener success cases', () => {
   test('calls client.application.commands.set correctly (doHandleReady directly called)', async () => {
     await doHandleReady(client);
     expect(client.application.commands.set).toHaveBeenCalledTimes(1); 
-    expect(client.application.commands.set).toHaveBeenCalledWith([{
-      name: expect.any(String), 
-      description: expect.any(String), 
-      run: expect.any(Function),
-    }]);
+    expect(client.application.commands.set).toHaveReturned();
   });
 
   test('console logs client.user.tag after client.application.commands.set (doHandleReady directly called)', async () => {

@@ -1,6 +1,7 @@
 import { Command } from './command-interface';
 import { embeds, getCommandEmbed } from '../embeds/helpEmbeds';
-import { buttons, helpButtonId } from '../buttons/buttons';
+import { buttons } from '../buttons/buttons';
+import { helpButtonId } from '../buttons/buttonIdData.json';
 import { 
   ApplicationCommandOptionType, 
   CacheType, 
@@ -32,7 +33,7 @@ export const executeHelp = async (_client: Client, interaction: ChatInputCommand
     return;
   } 
   
-  const helpButton = buttons.find(b => b.buttonId = helpButtonId);
+  const helpButton = buttons.find(b => b.buttonId === helpButtonId);
 
   helpButton.handleInteraction(interaction.channel);
 

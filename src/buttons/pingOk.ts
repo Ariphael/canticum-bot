@@ -1,4 +1,5 @@
 import { Button } from './button-interface';
+import { pingOkButtonId } from './buttonIdData.json';
 import { 
   ActionRowBuilder, 
   CacheType, 
@@ -10,17 +11,20 @@ import {
   MessageComponentInteraction
 } from 'discord.js';
 
-export const buttonId = 'pingOk';
+const okButtonRow = (
+  new ActionRowBuilder<ButtonBuilder>()
+    .addComponents([
+      new ButtonBuilder()
+        .setCustomId(pingOkButtonId)
+        .setLabel('OK')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(false),
+    ])
+);
 
 export const pingOk: Button = {
-  buttonId: buttonId,
-  row: new ActionRowBuilder<ButtonBuilder>()
-  .addComponents(
-    new ButtonBuilder()
-      .setCustomId('pingOk')
-      .setLabel('Ok')
-      .setStyle(ButtonStyle.Primary),
-  ), 
+  buttonId: pingOkButtonId,
+  row: okButtonRow, 
   handleInteraction: async (channel: GuildTextBasedChannel): Promise<void> => {
     await executePingOk(channel);
   }
@@ -28,7 +32,7 @@ export const pingOk: Button = {
 
 export const executePingOk = async (channel: GuildTextBasedChannel): Promise<void> => {
   const filter: CollectorFilter<[ButtonInteraction<"cached">]> = 
-    ( i: MessageComponentInteraction<CacheType> ) => i.customId === buttonId;
+    ( i: MessageComponentInteraction<CacheType> ) => i.customId === pingOkButtonId;
 
   const collector = channel.createMessageComponentCollector({ filter, time: 15000 });
 

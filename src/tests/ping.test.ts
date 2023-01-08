@@ -1,49 +1,16 @@
 import { Ping, executePing } from '../commands/ping';
-import { Button } from '../buttons/button-interface';
-import { 
-  ActionRowBuilder, 
-  ButtonInteraction, 
-  ButtonBuilder,
-  CacheType, 
-  ChatInputCommandInteraction, 
-  Client, 
-  EmbedBuilder, 
-  GuildTextBasedChannel, 
-  InteractionCollector, 
-  InteractionResponse, 
-  Message, 
-  SelectMenuInteraction, 
-  WebhookEditMessageOptions 
-} from 'discord.js';
+import { getClientMock, getInteractionCollectorMock } from '../mocks/mocks';
+import { getInteractionMock } from '../mocks/ping.test.mocks';
+import { getInteractionResponseMock, getMessageBooleanMock } from '../mocks/mocks';
 
 describe('ping command', () => {
-  const messageBoolean = ({} as unknown) as Message<boolean>;
+  const messageBoolean = getMessageBooleanMock();
+  const interactionResponse = getInteractionResponseMock();
+  const interactionCollector = getInteractionCollectorMock();
+  const interaction = 
+    getInteractionMock(interactionResponse, messageBoolean, interactionCollector);
 
-  const interactionResponse = ({
-    interaction: {
-      createdTimestamp: Number,
-    }
-  } as unknown) as InteractionResponse<boolean>;
-
-  const interactionCollector = ({
-    on: jest.fn(),
-  } as unknown) as InteractionCollector<SelectMenuInteraction<CacheType> | ButtonInteraction<CacheType>>;
-
-  const interaction = ({
-    deferReply: jest.fn(() => { return interactionResponse; }),
-    editReply: jest.fn(() => { return messageBoolean; }),
-    channel: {
-      createMessageComponentCollector: jest.fn(() => { return interactionCollector; }),
-    },
-    createdTimestamp: Number,
-  } as unknown) as ChatInputCommandInteraction<CacheType>;
-
-  const client = ({
-    intents: [],
-    ws: {
-      ping: Number,
-    }
-  } as unknown) as Client;
+  const client = getClientMock();
 
   // const button = ({
   //   handleInteraction: jest.fn(),

@@ -1,49 +1,28 @@
 import * as helpButtonsFile from '../buttons/help.buttons';
-import { prevButtonId, nextButtonId } from '../buttons/buttons';
-import { Button, HelpPageInfo } from '../buttons/button-interface';
 import { 
-  Awaitable,
+  getHelpPrevButtonMock, 
+  getHelpNextButtonMock, 
+  getInteractionCollectorMock, 
+  getGuildTextBasedChannelMock, 
+  getHelpButtonsMock
+} from '../mocks/mocks';
+import { HelpPageInfo } from '../buttons/button-interface';
+import { 
   ButtonInteraction, 
   CacheType, 
-  GuildTextBasedChannel, 
   InteractionCollector, 
-  MessageComponentInteraction, 
   SelectMenuInteraction 
 } from 'discord.js';
 
 type interactionCollectorType = InteractionCollector<ButtonInteraction<CacheType> |
                                 SelectMenuInteraction<CacheType>>;
 
+const iNextButton = getHelpNextButtonMock();
+
 describe('helpButtonsFile.executeHelpButton', () => {
-  const iPrevButton = ({
-    customId: prevButtonId,
-    update: jest.fn(),
-  } as unknown) as MessageComponentInteraction<CacheType>;
-
-  const iNextButton = ({
-    customId: nextButtonId,
-    update: jest.fn(),
-  } as unknown) as MessageComponentInteraction<CacheType>;
-
-  const interactionCollector = ({
-    on: jest.fn(),
-  } as unknown) as interactionCollectorType;
-
-  const guildTextBasedChannel = ({
-    createMessageComponentCollector: jest.fn(() => {
-      return interactionCollector;
-    }), 
-  } as unknown) as GuildTextBasedChannel;
-
-  const helpButtons = ({
-    row: {
-      components: [{
-        setDisabled: jest.fn(),
-      }, {
-        setDisabled: jest.fn(),
-      }]
-    }
-  } as unknown) as Button;
+  const interactionCollector = getInteractionCollectorMock();
+  const guildTextBasedChannel = getGuildTextBasedChannelMock(interactionCollector);
+  const helpButtons = getHelpButtonsMock();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -96,25 +75,8 @@ describe('helpButtonsFile.executeHelpButton', () => {
 });
 
 describe('helpButtonsFile.updateButtonMessage', () => {
-  const iPrevButton = ({
-    customId: prevButtonId,
-    update: jest.fn(),
-  } as unknown) as MessageComponentInteraction<CacheType>;
-
-  const iNextButton = ({
-    customId: nextButtonId,
-    update: jest.fn(),
-  } as unknown) as MessageComponentInteraction<CacheType>;
-
-  const helpButtons = ({
-    row: {
-      components: [{
-        setDisabled: jest.fn(),
-      }, {
-        setDisabled: jest.fn(),
-      }]
-    }
-  } as unknown) as Button;
+  const iPrevButton = getHelpPrevButtonMock();
+  const helpButtons = getHelpButtonsMock();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -152,7 +114,6 @@ describe('helpButtonsFile.updateButtonMessage', () => {
       maxPage: 3,
     } as unknown) as HelpPageInfo;
 
-    const pageNum = pageInfo.page;
     const nextButtonComponent = helpButtons.row.components[1];
 
     helpButtonsFile.updateButtonMessage(helpButtons.row.components, pageInfo, iNextButton);
@@ -224,15 +185,9 @@ describe('helpButtonsFile.updateButtonMessage', () => {
 });
 
 describe('helpButtons', () => {
-  const interactionCollector = ({
-    on: jest.fn(),
-  } as unknown) as interactionCollectorType;
+  const interactionCollector = getInteractionCollectorMock();
 
-  const guildTextBasedChannel = ({
-    createMessageComponentCollector: jest.fn(() => {
-      return interactionCollector;
-    }), 
-  } as unknown) as GuildTextBasedChannel;
+  const guildTextBasedChannel = getGuildTextBasedChannelMock(interactionCollector);
 
   test('handleInteraction calls executeHelpButtons', () => {
     jest.spyOn(helpButtonsFile.helpButtons, 'handleInteraction');

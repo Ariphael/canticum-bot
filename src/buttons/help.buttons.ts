@@ -1,6 +1,6 @@
 import { Button, HelpPageInfo } from './button-interface';
 import { numPages, embeds } from '../embeds/helpEmbeds';
-import { prevButtonId, nextButtonId, helpButtonId } from './buttons';
+import { prevButtonId, nextButtonId, helpButtonId } from './buttonIdData.json';
 import { 
   ActionRowBuilder, 
   CacheType, 
@@ -19,20 +19,18 @@ const pageInfo: HelpPageInfo = {
 
 const helpButtonRow = (
   new ActionRowBuilder<ButtonBuilder>()
-    .addComponents(
+    .addComponents([
       new ButtonBuilder()
         .setCustomId(prevButtonId)
         .setLabel('PREV')
         .setStyle(ButtonStyle.Secondary)
-        .setDisabled(pageInfo.page === 1 ? true : false)
-    )
-    .addComponents(
+        .setDisabled(pageInfo.page === 1 ? true : false),
       new ButtonBuilder()
         .setCustomId(nextButtonId)
         .setLabel('NEXT')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(pageInfo.page === pageInfo.maxPage ? true : false)
-    )
+    ])
 );
 
 export const helpButtons: Button = {
@@ -60,6 +58,7 @@ export const updateButtonMessage = async (components: ButtonBuilder[], pageInfo:
       nextButtonComponent.setDisabled(true);
     }
   }
+
   await i.update({ 
     content: '', 
     components: [helpButtonRow], 
