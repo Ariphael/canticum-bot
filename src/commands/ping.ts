@@ -18,7 +18,6 @@ export const Ping: Command = {
 
 export const executePing = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
   const button = buttons.find(b => b.buttonId === pingOkButtonId);
-  const row = button.row;
   
   button.handleInteraction(interaction.channel);
 
@@ -33,5 +32,5 @@ export const executePing = async (client: Client, interaction: ChatInputCommandI
     `Bot latency: ${botLatency}ms\nAPI latency: ${apiLatency}ms`
   );
 
-  await interaction.editReply({ content: '', components: [row], embeds: [embed] });
+  await interaction.editReply({ content: '', components: [button.row], embeds: [embed] });
 };

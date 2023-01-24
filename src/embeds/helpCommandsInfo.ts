@@ -3,8 +3,8 @@ export const commandData = [{
   commandDescription: 'Displays list of commands or information about command', 
   commandOptions: 'help (command)', 
 }, {
-  commandName: 'connect', 
-  commandDescription: 'Conncects to a voice channel. If no specific voice channel target is configured, then it joins a voice channel named "Canticum Music"',
+  commandName: 'connect [target]', 
+  commandDescription: 'Conncects to a voice channel. If no specific voice channel target is stated, then it joins a voice channel named "Music Canticum"',
   commandOptions: 'connect', 
 }, {
   commandName: 'disconnect', 
