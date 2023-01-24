@@ -1,9 +1,10 @@
 import { 
   ChatInputCommandInteraction, 
   ChatInputApplicationCommandData, 
-  CacheType 
+  CacheType,
+  Client
 } from "discord.js";
 
 export interface Command extends ChatInputApplicationCommandData {
-  run: (interaction: ChatInputCommandInteraction<CacheType>) => void;
-}
+  run: (client: Client, interaction: ChatInputCommandInteraction<CacheType>) => void;
+};

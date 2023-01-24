@@ -1,0 +1,6 @@
+{
+  "prevButtonId": "helpPrev",
+  "nextButtonId": "helpNext", 
+  "helpButtonId": "helpButtons",
+  "pingOkButtonId": "pingOk"
+}
