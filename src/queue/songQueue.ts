@@ -1,14 +1,14 @@
-type MusicQueueItemType = {musicTitle: String, musicLink: String};
+type MusicQueueItemType = {musicTitle: String, musicId: String};
 const musicQueue: MusicQueueItemType[] = [];
 
-export const addSongRequest = (musicTitle: String, musicLink: String): number => {
+export const addSongRequest = (musicTitle: String, musicId: String): number => {
   return musicQueue.push({
     musicTitle: musicTitle,
-    musicLink: musicLink,
+    musicId: musicId,
   });
 }
 
-export const dequeue = (): {musicTitle: String, musicLink: String} => {
+export const dequeue = (): {musicTitle: String, musicId: String} => {
   return musicQueue.shift();
 }
 

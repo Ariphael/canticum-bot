@@ -19,10 +19,10 @@ afterEach(() => {
 describe('addSongRequest', () => {
   test('addSongRequest correctly pushes a song request to queue', () => {
     const oldQueueLength: number = getMusicQueue().length;
-    const newQueueLength: number = addSongRequest('musicTitle', 'musicLink');
+    const newQueueLength: number = addSongRequest('musicTitle', 'musicId');
     expect(getMusicQueue()).toStrictEqual([{ 
       'musicTitle': 'musicTitle',
-      'musicLink': 'musicLink',
+      'musicId': 'musicId',
     }]);
     expect(newQueueLength).toBe(oldQueueLength + 1);
   })
@@ -30,20 +30,20 @@ describe('addSongRequest', () => {
   test('addSongRequest correctly pushes multiple song requests to queue', () => {
     const oldQueueLength: number = getMusicQueue().length;
     const newQueueLengths: number[] = [
-      addSongRequest('musicTitle1', 'musicLink1'),
-      addSongRequest('musicTitle2', 'musicLink2'),
-      addSongRequest('musicTitle3', 'musicLink3'),
+      addSongRequest('musicTitle1', 'musicId1'),
+      addSongRequest('musicTitle2', 'musicId2'),
+      addSongRequest('musicTitle3', 'musicId3'),
     ];
     expect(getMusicQueue()).toStrictEqual([
       { 
         'musicTitle': 'musicTitle1',
-        'musicLink': 'musicLink1',
+        'musicId': 'musicId1',
       }, { 
         'musicTitle': 'musicTitle2',
-        'musicLink': 'musicLink2', 
+        'musicId': 'musicId2', 
       }, { 
         'musicTitle': 'musicTitle3',
-        'musicLink': 'musicLink3',
+        'musicId': 'musicId3',
       },
     ]);
     expect(newQueueLengths[0]).toBe(oldQueueLength + 1);
@@ -58,42 +58,42 @@ describe('dequeue', () => {
   });
 
   test('dequeue correctly returns and removes first element of array (1 element)', () => {
-    addSongRequest('musicTitle', 'musicLink');
+    addSongRequest('musicTitle', 'musicId');
     expect(dequeue()).toStrictEqual({ 
       'musicTitle': 'musicTitle',
-      'musicLink': 'musicLink',
+      'musicId': 'musicId',
     });
     expect(getMusicQueue()).toStrictEqual([]);
   });
 
   test('dequeue correctly returns and removes first element of array (many elements)', () => {
-    addSongRequest('musicTitle1', 'musicLink1');
-    addSongRequest('musicTitle2', 'musicLink2');
-    addSongRequest('musicTitle3', 'musicLink3');
+    addSongRequest('musicTitle1', 'musicId1');
+    addSongRequest('musicTitle2', 'musicId2');
+    addSongRequest('musicTitle3', 'musicId3');
     expect(dequeue()).toStrictEqual({ 
       'musicTitle': 'musicTitle1',
-      'musicLink': 'musicLink1',
+      'musicId': 'musicId1',
     });
     expect(getMusicQueue()).toStrictEqual([
       { 
         'musicTitle': 'musicTitle2',
-        'musicLink': 'musicLink2' 
+        'musicId': 'musicId2' 
       }, { 
         'musicTitle': 'musicTitle3',
-        'musicLink': 'musicLink3' 
+        'musicId': 'musicId3' 
       },
     ]);
     expect(dequeue()).toStrictEqual({ 
       'musicTitle': 'musicTitle2',
-      'musicLink': 'musicLink2' 
+      'musicId': 'musicId2' 
     });
     expect(getMusicQueue()).toStrictEqual([{
       'musicTitle': 'musicTitle3',
-      'musicLink': 'musicLink3' 
+      'musicId': 'musicId3' 
     }]);
     expect(dequeue()).toStrictEqual({ 
       'musicTitle': 'musicTitle3',
-      'musicLink': 'musicLink3' 
+      'musicId': 'musicId3' 
     });
     expect(getMusicQueue()).toStrictEqual([]);
   });
@@ -122,40 +122,40 @@ describe('swapQueuePositions', () => {
   });
 
   test('correctly swaps two elements in the queue', () => {
-    addSongRequest('musicTitle1', 'musicLink1');
-    addSongRequest('musicTitle2', 'musicLink2');
-    addSongRequest('musicTitle3', 'musicLink3');
+    addSongRequest('musicTitle1', 'musicId1');
+    addSongRequest('musicTitle2', 'musicId2');
+    addSongRequest('musicTitle3', 'musicId3');
     const modifiedMusicQueue = swapQueuePositions(1, 2);
     expect(modifiedMusicQueue).toStrictEqual([
       {
         'musicTitle': 'musicTitle1',
-        'musicLink': 'musicLink1',
+        'musicId': 'musicId1',
       }, {
         'musicTitle': 'musicTitle3',
-        'musicLink': 'musicLink3',
+        'musicId': 'musicId3',
       }, {
         'musicTitle': 'musicTitle2',
-        'musicLink': 'musicLink2',
+        'musicId': 'musicId2',
       },
     ]);
     expect(modifiedMusicQueue).toStrictEqual(getMusicQueue());
   });
 
   test('queue is unmodified if positionA = positionB', () => {
-    addSongRequest('musicTitle1', 'musicLink1');
-    addSongRequest('musicTitle2', 'musicLink2');
-    addSongRequest('musicTitle3', 'musicLink3');
+    addSongRequest('musicTitle1', 'musicId1');
+    addSongRequest('musicTitle2', 'musicId2');
+    addSongRequest('musicTitle3', 'musicId3');
     const modifiedMusicQueue = swapQueuePositions(1, 1);
     expect(modifiedMusicQueue).toStrictEqual([
     {
       'musicTitle': 'musicTitle1',
-      'musicLink': 'musicLink1',
+      'musicId': 'musicId1',
     }, {
       'musicTitle': 'musicTitle2',
-      'musicLink': 'musicLink2',
+      'musicId': 'musicId2',
     }, {
       'musicTitle': 'musicTitle3',
-      'musicLink': 'musicLink3',
+      'musicId': 'musicId3',
     },
     ]);
     expect(modifiedMusicQueue).toStrictEqual(getMusicQueue());    
@@ -164,54 +164,54 @@ describe('swapQueuePositions', () => {
 
 describe('getMusicQueue', () => {
   test('returns music queue', () => {
-    addSongRequest('musicTitle1', 'musicLink1');
+    addSongRequest('musicTitle1', 'musicId1');
     expect(getMusicQueue()).toStrictEqual([
       {
         'musicTitle': 'musicTitle1',
-        'musicLink': 'musicLink1'
+        'musicId': 'musicId1'
       },
     ]);   
-    addSongRequest('musicTitle2', 'musicLink2');
+    addSongRequest('musicTitle2', 'musicId2');
     expect(getMusicQueue()).toStrictEqual([
       {
         'musicTitle': 'musicTitle1',
-        'musicLink': 'musicLink1',
+        'musicId': 'musicId1',
       }, {
         'musicTitle': 'musicTitle2',
-        'musicLink': 'musicLink2',
+        'musicId': 'musicId2',
       },
     ]);    
-    addSongRequest('musicTitle3', 'musicLink3');
+    addSongRequest('musicTitle3', 'musicId3');
     expect(getMusicQueue()).toStrictEqual([
       {
         'musicTitle': 'musicTitle1',
-        'musicLink': 'musicLink1',
+        'musicId': 'musicId1',
       }, {
         'musicTitle': 'musicTitle2',
-        'musicLink': 'musicLink2'
+        'musicId': 'musicId2'
       }, {
         'musicTitle': 'musicTitle3',
-        'musicLink': 'musicLink3',
+        'musicId': 'musicId3',
       }
     ]);    
     dequeue();
     expect(getMusicQueue()).toStrictEqual([
       {
         'musicTitle': 'musicTitle2',
-        'musicLink': 'musicLink2',
+        'musicId': 'musicId2',
       }, {
         'musicTitle': 'musicTitle3',
-        'musicLink': 'musicLink3'
+        'musicId': 'musicId3'
       },
     ]); 
     swapQueuePositions(0, 1);
     expect(getMusicQueue()).toStrictEqual([
       {
         'musicTitle': 'musicTitle3',
-        'musicLink': 'musicLink3',
+        'musicId': 'musicId3',
       }, {
         'musicTitle': 'musicTitle2',
-        'musicLink': 'musicLink2'
+        'musicId': 'musicId2'
       },
     ]);     
   });
@@ -219,9 +219,9 @@ describe('getMusicQueue', () => {
 
 describe('clearQueue', () => {
   test('clears queue correctly', () => {
-    addSongRequest('musicTitle1', 'musicLink1');
-    addSongRequest('musicTitle2', 'musicLink2');
-    addSongRequest('musicTitle3', 'musicLink3');
+    addSongRequest('musicTitle1', 'musicId1');
+    addSongRequest('musicTitle2', 'musicId2');
+    addSongRequest('musicTitle3', 'musicId3');
     expect(getMusicQueue()).not.toStrictEqual([]);
     clearQueue();
     expect(getMusicQueue()).toStrictEqual([]);        
