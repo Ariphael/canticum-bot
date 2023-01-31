@@ -1,4 +1,4 @@
-type MusicQueueItemType = {musicTitle: String, musicId: String};
+type MusicQueueItemType = { musicTitle: String, musicId: String };
 const musicQueue: MusicQueueItemType[] = [];
 
 export const addSongRequest = (musicTitle: String, musicId: String): number => {
