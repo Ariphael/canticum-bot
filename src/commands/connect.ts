@@ -8,6 +8,7 @@ import {
   EmbedBuilder,
 } from 'discord.js';
 import { getVoiceConnection, joinVoiceChannel, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
+import { createNewAudioPlayer } from '../audioplayer/audioPlayer';
 
 export const Connect: Command = {
   name: 'connect',
@@ -31,11 +32,12 @@ export const executeConnect = async (_client: Client, interaction: ChatInputComm
   if (testMode) {
     console.log('joinVoiceChannel');
   } else {
-    joinVoiceChannel({
-      channelId: interaction.options.getChannel('channel').id,
+    const voiceConnection = joinVoiceChannel({
+      channelId: requestedChannelId,
       guildId: interaction.guild.id,
       adapterCreator: interaction.guild.voiceAdapterCreator,
-    });
+    })
+    voiceConnection.subscribe(createNewAudioPlayer());
   }
 
   embed.setDescription(`Connected to voice channel ${requestedChannelId}`);
