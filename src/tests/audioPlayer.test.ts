@@ -8,6 +8,7 @@ import { join } from 'path';
 // } from '@discordjs/voice'; 
 import * as discordJsVoice from '@discordjs/voice';
 import { 
+  createNewAudioPlayer,
   stopAudioPlayer,
   playAudio,
   getAudioPlayer,
@@ -61,7 +62,7 @@ describe('stopAudioPlayer', () => {
       .mockImplementation(() => {
         return true;
       });
-    createAudioPlayerResource();
+    createNewAudioPlayer();
     expect(getAudioPlayer()).not.toBe(null);
     expect(stopAudioPlayer()).toBe(true);
     expect(audioPlayerStopSpy).toHaveBeenCalledTimes(1);
@@ -71,14 +72,14 @@ describe('stopAudioPlayer', () => {
 
 describe('createAudioPlayerResource', () => {
   test('creates an audio player', () => {
-    createAudioPlayerResource();
+    createNewAudioPlayer();
     expect(getAudioPlayer()).not.toBe(null);
     expect(getAudioPlayer()).toBeInstanceOf(discordJsVoice.AudioPlayer);
   });
 
   test('configures audio player to pause the stream if there are no active subscribers', () => {
     const spy = jest.spyOn(discordJsVoice, 'createAudioPlayer');
-    createAudioPlayerResource();
+    createNewAudioPlayer();
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith({
       behaviors: {
