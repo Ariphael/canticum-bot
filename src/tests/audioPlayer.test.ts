@@ -8,7 +8,6 @@ import { join } from 'path';
 // } from '@discordjs/voice'; 
 import * as discordJsVoice from '@discordjs/voice';
 import { 
-  createAudioPlayerResource,
   stopAudioPlayer,
   playAudio,
   getAudioPlayer,
