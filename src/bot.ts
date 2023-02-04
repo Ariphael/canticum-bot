@@ -14,7 +14,10 @@ export const startCanticum = async (client: Client<boolean>) => {
 };
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildVoiceStates
+  ]
 });
 
 startCanticum(client);
