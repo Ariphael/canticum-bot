@@ -1,6 +1,4 @@
 import ytdl from 'ytdl-core';
-import { join } from 'path';
-import { existsSync } from 'fs';
 import { dequeue } from '../queue/songQueue';
 import { 
   AudioPlayer, 
@@ -11,8 +9,6 @@ import {
   createAudioResource, 
   NoSubscriberBehavior 
 } from '@discordjs/voice';
-import { formatEmoji } from 'discord.js';
-import { MusicQueueItemType } from '../types/types';
 
 const audioPlayerComponents: { audioPlayer: AudioPlayer, audioResource: AudioResource } = {
   audioPlayer: null, 

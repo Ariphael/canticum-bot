@@ -1,4 +1,5 @@
 type MusicQueueItemType = { musicTitle: String, musicId: String };
+
 const musicQueue: MusicQueueItemType[] = [];
 
 export const addSongRequest = (musicTitle: String, musicId: String): number => {
@@ -8,7 +9,7 @@ export const addSongRequest = (musicTitle: String, musicId: String): number => {
   });
 }
 
-export const dequeue = (): {musicTitle: String, musicId: String} => {
+export const dequeue = (): {musicTitle: String, musicId: String} | undefined => {
   return musicQueue.shift();
 }
 

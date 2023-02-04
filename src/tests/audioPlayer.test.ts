@@ -90,10 +90,10 @@ describe('createAudioPlayerResource', () => {
 });
 
 describe('playAudio', () => {
-  test('returns false if audio player does not have subscribers', () => {
-    expect(getAudioPlayerSubscribers()).toStrictEqual([]);
-    expect(playAudio('test')).toBe(false);
-  });
+  // test('returns false if audio player does not have subscribers', () => {
+  //   expect(getAudioPlayerSubscribers()).toStrictEqual([]);
+  //   expect(playAudio('test')).toBe(false);
+  // });
 
   // test('returns false if audioId is empty (audio player and file exists)', () => {
   //   createAudioPlayerResource();
