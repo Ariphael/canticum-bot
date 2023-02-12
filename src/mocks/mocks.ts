@@ -3,6 +3,7 @@ import { Button } from '../buttons/button-interface';
 import { 
   ButtonInteraction, 
   CacheType, 
+  ChatInputCommandInteraction, 
   Client, 
   GuildTextBasedChannel, 
   InteractionCollector, 
@@ -12,6 +13,7 @@ import {
   SelectMenuInteraction 
 } from "discord.js";
 import { Command } from '../commands/command-interface';
+import { VoiceConnection } from '@discordjs/voice';
 
 type interactionCollectorType = 
   InteractionCollector<SelectMenuInteraction<CacheType> | ButtonInteraction<CacheType>>;
@@ -88,3 +90,20 @@ export const getMessageComponentInteractionMock = () =>
   (({
     update: jest.fn(),
   } as unknown) as MessageComponentInteraction<CacheType>);
+
+export const getChatInputCommandInteractionMock = () => 
+  (({
+    guild: {
+      id: String,
+      voiceAdapterCreator: jest.fn()
+    },
+    editReply: jest.fn(), 
+    options: {
+      getChannel: jest.fn((name: string) => {
+        return {
+          id: String,
+        }
+      }),
+    },
+    reply: jest.fn(),
+  } as unknown) as ChatInputCommandInteraction<CacheType>);

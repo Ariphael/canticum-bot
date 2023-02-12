@@ -1,6 +1,6 @@
 import { CacheType, ChatInputCommandInteraction } from "discord.js";
 
-export const getInteraction = () => 
+export const getChatInputCommandInteractionMock = () => 
   (({
     reply: jest.fn(),
     commandName: String,
