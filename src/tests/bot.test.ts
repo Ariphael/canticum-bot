@@ -2,8 +2,6 @@ import { startCanticum } from '../bot';
 import { getClientMock } from '../mocks/bot.test.mocks';
 import { BitFieldResolvable, Client, ClientUser } from 'discord.js';
 
-// jest.mock('discord.js');
-
 describe('bot.ts tests', () => {
   const client = getClientMock();
 

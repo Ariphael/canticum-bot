@@ -1,5 +1,5 @@
 import { doHandleSlashCommand } from '../listeners/interactionCreate';
-import { getInteraction } from '../mocks/interactionCreate.listener.mocks';
+import { getChatInputCommandInteractionMock } from '../mocks/interactionCreate.listener.mocks';
 import { 
   getClientMock, 
   getInteractionNotChatInputCommandMock, 
@@ -8,7 +8,7 @@ import {
 
 describe('interactionCreate listener tests', () => {
   const interactionNotChatInputCommand = getInteractionNotChatInputCommandMock();
-  const interaction = getInteraction();
+  const interaction = getChatInputCommandInteractionMock();
   const client = getClientMock();
   const slashCommandA = getSlashCommandMock();
   const slashCommandB = getSlashCommandMock();
