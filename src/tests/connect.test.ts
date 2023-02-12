@@ -1,47 +1,53 @@
-import { joinVoiceChannel } from '@discordjs/voice';
-import { CacheType, ChatInputCommandInteraction } from 'discord.js';
-import { Connect, executeConnect } from '../commands/connect';
-import { executeDisconnect } from '../commands/disconnect';
-import { startCanticum } from '../bot';
+import * as discordJsVoice from '@discordjs/voice';
+import { executeConnect } from '../commands/connect';
 import { getClientMock } from '../mocks/mocks';
+import { MusicPlayer } from '../musicplayer/MusicPlayer';
+import { getChatInputCommandInteractionMock } from '../mocks/mocks';
+
+const discordJsVoiceConnectionMock = ({
+  subscribe: jest.fn(),
+  on: jest.fn(),
+} as unknown) as discordJsVoice.VoiceConnection;
+
+jest.mock('@discordjs/voice', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('@discordjs/voice'),
+    joinVoiceChannel: jest.fn(() => discordJsVoiceConnectionMock),
+  };
+});
 
 describe('connect command', () => {
-  const interaction = ({
-    guild: {
-      id: String,
-      voiceAdapterCreator: Number,
-    },
-    editReply: jest.fn(), 
-    options: {
-      getChannel: jest.fn((name: string) => {
-        return {
-          id: String,
-        }
-      }),
-    },
-    reply: jest.fn(),
-  } as unknown) as ChatInputCommandInteraction<CacheType>;
+  const interaction = getChatInputCommandInteractionMock();
 
   const client = getClientMock();
-
-  jest.mock('@discordjs/voice');
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  // could not find way to test run method in Connect because of joinVoiceChannel in 
-  // @discordjs/voice being declared as function declaration rather than function expression.
-
   test('calls joinVoiceChannel method from @discordjs/voice module to initiate a connection to voice channel (executeConnection called directly)', async () => {
-    const spy = jest.spyOn(console, 'log');
-    await executeConnect(client, interaction, true);
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith(expect.any(String));
+    const joinVoiceChannelSpy = jest.spyOn(discordJsVoice, 'joinVoiceChannel');
+    await executeConnect(client, interaction);
+    expect(joinVoiceChannelSpy).toHaveBeenCalledTimes(1);
+    expect(joinVoiceChannelSpy).toHaveBeenCalledWith({
+      channelId: expect.any(Function),
+      guildId: expect.any(Function),
+      adapterCreator: interaction.guild.voiceAdapterCreator
+    });
+  });
+
+  test('adds music player to voice connection subscriptions\'s by calling MusicPlayer\'s addToVoiceConnectionSubscriptions function', async () => {
+    const musicPlayerAddToVoiceConnectionSubscriptionsMock = 
+      jest.spyOn(MusicPlayer.prototype, 'addToVoiceConnectionSubscriptions');
+    await executeConnect(client, interaction);
+    expect(musicPlayerAddToVoiceConnectionSubscriptionsMock).toHaveBeenCalledTimes(1);
+    expect(musicPlayerAddToVoiceConnectionSubscriptionsMock)
+      .toHaveBeenCalledWith(discordJsVoiceConnectionMock);
   });
 
   test('calls interaction.reply upon connecting to a voice channel (executeConnection function directly called)', async () => {
-    await executeConnect(client, interaction, true);
+    await executeConnect(client, interaction);
     expect(interaction.reply).toBeCalledTimes(1);
     expect(interaction.reply).toBeCalledWith({ 
       content: '', 
@@ -49,18 +55,4 @@ describe('connect command', () => {
       embeds: expect.any(Object)
     });
   });
-
-  test('calls joinVoiceChannel and interaction.reply if connection to a voice channel is already established (executeConnection function directly called)', async () => {
-    const spy = jest.spyOn(console, 'log');
-    await executeConnect(client, interaction, true);
-    await executeConnect(client, interaction, true);
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledWith(expect.any(String));
-    expect(interaction.reply).toHaveBeenCalledTimes(2);
-    expect(interaction.reply).toBeCalledWith({ 
-      content: '', 
-      components: expect.any(Object), 
-      embeds: expect.any(Object)
-    });
-  })
 });
