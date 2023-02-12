@@ -1,9 +1,7 @@
 import { Command } from './command-interface';
-import * as ytdl from 'ytdl-core';
-import * as fs from 'fs';
 import { apikey } from '../config.json';
 import axios from 'axios';
-import { addSongRequest, dequeue } from '../queue/songQueue';
+import { addSongRequest } from '../queue/songQueue';
 import { 
   ApplicationCommandOptionType,
   CacheType, 
@@ -11,8 +9,8 @@ import {
   Client,
   EmbedBuilder,
 } from 'discord.js';
-import { getAudioPlayer, isPlayingAudio, playAudio } from '../audioplayer/audioPlayer';
-import { AudioPlayerStatus, getVoiceConnection } from '@discordjs/voice';
+import { MusicPlayer } from '../musicplayer/MusicPlayer';
+import { getVoiceConnection } from '@discordjs/voice';
 
 export const Play: Command = {
   name: 'play',
@@ -28,7 +26,7 @@ export const Play: Command = {
   }
 };
 
-export const executePlay = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
+export const executePlay = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   const embed = new EmbedBuilder().setColor(0x0099FF);
   if (getVoiceConnection(interaction.guild.id) === undefined) {
     embed.setDescription('Must be connected to voice channel first!');
@@ -37,31 +35,27 @@ export const executePlay = async (client: Client, interaction: ChatInputCommandI
   }
 
   const query = interaction.options.getString('query');
+  const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
   const youtubeApiResponse = await axios({
     method: 'get',
     url: 
       `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${query}g&key=
       ${apikey}`
   });
-
   const newQueueLength = addSongRequest(
     youtubeApiResponse.data.items[0].snippet.title, 
     youtubeApiResponse.data.items[0].id.videoId
   );
 
-  playAudio();
-
-  if (!isPlayingAudio() && newQueueLength === 1) {
-    embed.setTitle(`Now playing`)
-      .setDescription(youtubeApiResponse.data.items[0].snippet.title)
-      .setURL(`https://www.youtube.com/watch?v=${youtubeApiResponse.data.items[0].id.videoId}`)
-      .setTimestamp();
+  if (!musicPlayerInstance.isPlayingAudio() && newQueueLength === 1) {
+    musicPlayerInstance.playAudio();
+    embed.setTitle(`Now playing`);
   } else {
-    embed.setTitle(`Added to Queue`)
-      .setDescription(youtubeApiResponse.data.items[0].snippet.title)
-      .setURL(`https://www.youtube.com/watch?v=${youtubeApiResponse.data.items[0].id.videoId}`)
-      .setTimestamp();    
+    embed.setTitle(`Added to Queue`);
   }
+  embed.setDescription(youtubeApiResponse.data.items[0].snippet.title)
+    .setURL(`https://www.youtube.com/watch?v=${youtubeApiResponse.data.items[0].id.videoId}`)
+    .setTimestamp(); 
   
   await interaction.reply({ content: '', components: [], embeds: [embed] });
 };
