@@ -24,6 +24,18 @@ export const swapQueuePositions = (positionA: number, positionB: number): MusicQ
   return musicQueue;
 }
 
+export const musicQueueForEach = (callbackFn: (value: MusicQueueItemType, index: number) => void) => {
+  musicQueue.forEach(callbackFn);
+}
+
+export const getMusicQueueItem = (index: number) => {
+  return musicQueue.at(index);
+}
+
+export const getMusicQueueLength = (): number => {
+  return musicQueue.length;
+}
+
 export const getMusicQueue = (): MusicQueueItemType[] => {
   return musicQueue;
 }
