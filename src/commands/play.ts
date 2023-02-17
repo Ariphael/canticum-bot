@@ -1,4 +1,4 @@
-import { Command } from './command-interface';
+import { Command } from '../interfaces/command-interface';
 import { apikey } from '../config.json';
 import axios from 'axios';
 import { addSongRequest } from '../queue/songQueue';
@@ -26,7 +26,7 @@ export const Play: Command = {
   }
 };
 
-export const executePlay = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
+const executePlay = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   const embed = new EmbedBuilder().setColor(0x0099FF);
   if (getVoiceConnection(interaction.guild.id) === undefined) {
     embed.setDescription('Must be connected to voice channel first!');

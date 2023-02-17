@@ -1,4 +1,4 @@
-import { Command } from './command-interface';
+import { Command } from '../interfaces/command-interface';
 import { 
   ApplicationCommandOptionType,
   CacheType, 
@@ -25,11 +25,13 @@ export const Connect: Command = {
   }
 };
 
-export const executeConnect = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
-  const embed = new EmbedBuilder().setColor(0x0099FF);
-  const requestedChannelId = interaction.options.getChannel('channel').id;
+const executeConnect = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
+  const embed = new EmbedBuilder()
+    .setColor(0x0099FF)
+    .setTitle('Connect');
+  const requestedChannel = interaction.options.getChannel('channel');
   const voiceConnection = joinVoiceChannel({
-    channelId: requestedChannelId,
+    channelId: requestedChannel.id,
     guildId: interaction.guild.id,
     adapterCreator: interaction.guild.voiceAdapterCreator,
   });
@@ -50,6 +52,6 @@ export const executeConnect = async (_client: Client, interaction: ChatInputComm
   });
 
   MusicPlayer.getMusicPlayerInstance().addToVoiceConnectionSubscriptions(voiceConnection);
-  embed.setDescription(`Connected to voice channel ${requestedChannelId}`);
+  embed.setDescription(`Connected to voice channel ${requestedChannel.name}`);
   await interaction.reply({ content: '', components: [], embeds: [embed] });
 };

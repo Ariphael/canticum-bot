@@ -1,4 +1,4 @@
-import { Command } from './command-interface';
+import { Command } from '../interfaces/command-interface';
 import { embeds, getCommandEmbed } from '../embeds/helpEmbeds';
 import { buttons } from '../buttons/buttons';
 import { helpButtonId } from '../buttons/buttonIdData.json';
@@ -24,9 +24,7 @@ export const Help: Command = {
   }
 }; 
 
-export const executeHelp = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  await interaction.deferReply();
-  
+const executeHelp = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   if (interaction.options.get('command')) {
     const commandEmbed: EmbedBuilder = getCommandEmbed(interaction.options.getString('command'));
     await interaction.editReply({ content: '', components: [], embeds: [commandEmbed]});
@@ -37,5 +35,5 @@ export const executeHelp = async (_client: Client, interaction: ChatInputCommand
 
   helpButton.handleInteraction(interaction.channel);
 
-  await interaction.editReply({ content: '', components: [helpButton.row], embeds: [embeds[0]] });
+  await interaction.reply({ content: '', components: [helpButton.row], embeds: [embeds[0]] });
 };
