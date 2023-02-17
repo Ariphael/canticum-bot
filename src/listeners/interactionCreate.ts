@@ -1,24 +1,25 @@
-import { CacheType, Interaction, ButtonInteraction, Client } from 'discord.js';
-import { commands } from '../commands/commands';
-import { Command } from '../commands/command-interface'
+import { CacheType, Interaction, Client, Collection } from 'discord.js';
+import { Command } from '../interfaces/command-interface'
 
-
-export const interactionCreate = (client: Client) => {
+export const interactionCreate = (client: Client, commandCollection: Collection<string, Command>) => {
   client.on('interactionCreate', async (interaction: Interaction<CacheType>) => {
     if (interaction.isCommand() || interaction.isContextMenuCommand()) {
-      await doHandleSlashCommand(commands, client, interaction);
+      if (!interaction.isChatInputCommand()) return;   
+
+      const slashCommand = commandCollection.get(interaction.commandName);
+      if (slashCommand === undefined) {
+        await interaction.reply({ content: "An error has occurred!", ephemeral: true });
+        return;
+      }
+    
+      try {
+        slashCommand.run(client, interaction);
+      } catch (error) {
+        await interaction.reply({ 
+          content: 'There was an error while executing this command!', 
+          ephemeral: true 
+        });
+      }
     }
   });
-}
-
-export const doHandleSlashCommand = async (commandArr: Command[], client: Client, interaction: Interaction<CacheType>): Promise<void> => {
-  if (!interaction.isChatInputCommand()) return;   
-
-  const slashCommand = commandArr.find(c => c.name === interaction.commandName);
-  if (slashCommand === undefined) {
-    await interaction.reply({ content: "An error has occurred!", ephemeral: true });
-    return;
-  }
-
-  slashCommand.run(client, interaction);
 }

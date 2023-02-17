@@ -1,20 +1,12 @@
-import { Client } from "discord.js";
-import { commands } from '../commands/commands';
+import { Client, Collection } from "discord.js";
+import { Command } from "../interfaces/command-interface";
 
-export const ready = (client: Client) => {
+export const ready = (client: Client, commandCollection: Collection<string, Command>) => {
   client.once('ready', async () => {
-    await doHandleReady(client);
-  });
-}
-
-export const doHandleReady = async (client: Client) => {
-  if (client.user !== null) {
-    if (!client.user || !client.application) {
-      return;
+    if (client.user !== null) {
+      if (!client.application) return;
+      await client.application.commands.set(Array.from(commandCollection.values()));
+      console.log(`Ready! Logged in as ${client.user.tag} (ID: ${client.user.id})`);
     }
-
-    await client.application.commands.set(commands);
-
-    console.log(`Ready! Logged in as ${client.user.tag}`);
-  }
+  });
 }
