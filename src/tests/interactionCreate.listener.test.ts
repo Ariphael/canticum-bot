@@ -1,111 +1,76 @@
-import { doHandleSlashCommand } from '../listeners/interactionCreate';
-import { getChatInputCommandInteractionMock } from '../mocks/interactionCreate.listener.mocks';
+import { ChatInputCommandInteraction, Collection } from 'discord.js';
+import { addInteractionCreateEventToClient } from '../events/interactionCreate';
+import { Command } from '../interfaces/command-interface';
 import { 
   getClientMock, 
-  getInteractionNotChatInputCommandMock, 
+  getChatInputCommandInteractionMock, 
+  getInteractionNotCommandMock, 
+  getContextMenuCommandInteractionMock
+} from '../mocks/interactionCreate.listener.mocks';
+import { 
   getSlashCommandMock 
 } from '../mocks/mocks';
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('interactionCreate listener tests', () => {
-  const interactionNotChatInputCommand = getInteractionNotChatInputCommandMock();
+  const interactionNotCommand = getInteractionNotCommandMock();
+  const interactionNotChatInputCommand = getContextMenuCommandInteractionMock();
   const interaction = getChatInputCommandInteractionMock();
   const client = getClientMock();
-  const slashCommandA = getSlashCommandMock();
-  const slashCommandB = getSlashCommandMock();
-  const slashCommandC = getSlashCommandMock();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  })
-
-  test('returns if interaction is not a chat input command', () => {
-    doHandleSlashCommand([], client, interactionNotChatInputCommand);
-    expect(interactionNotChatInputCommand.reply).toHaveBeenCalledTimes(0);
-    expect(slashCommandA.run).toHaveBeenCalledTimes(0);
+  test('does nothing if interaction is not from a command', async () => {
+    const clientOnSpy = jest.spyOn(client, 'on');
+    addInteractionCreateEventToClient(client, null);
+    const clientOnCallbackFn = clientOnSpy.mock.calls[0][1];
+    await clientOnCallbackFn(interactionNotCommand);
+    expect(interactionNotCommand.reply).not.toHaveBeenCalled();
   });
 
-  test('calls interaction.reply correctly if there are no commands', () => {
-    interaction.commandName = "";
-    doHandleSlashCommand([], client, interaction);
+  test('does nothing if interaction is not from a chat input command', async () => {
+    const clientOnSpy = jest.spyOn(client, 'on');
+    addInteractionCreateEventToClient(client, null);
+    const clientOnCallbackFn = clientOnSpy.mock.calls[0][1];
+    await clientOnCallbackFn(interactionNotChatInputCommand);
+    expect(interactionNotCommand.reply).not.toHaveBeenCalled();
+  });
+
+  test('sends a message to channel if cannot find command in command collection', async () => {
+    const clientOnSpy = jest.spyOn(client, 'on');
+    const commandCollection = new Collection<string, Command>();
+    addInteractionCreateEventToClient(client, commandCollection);
+    const clientOnCallbackFn = clientOnSpy.mock.calls[0][1];
+    await clientOnCallbackFn(interaction);
     expect(interaction.reply).toHaveBeenCalledTimes(1);
-    expect(interaction.reply).toHaveBeenCalledWith({ 
+    expect(interaction.reply).toHaveBeenCalledWith({
       content: expect.any(String),
-      ephemeral: expect.any(Boolean)
+      ephemeral: expect.any(Boolean),
     });
-    expect(slashCommandA.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandB.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandC.run).toHaveBeenCalledTimes(0);
   });
 
-  test('calls interaction.reply correctly if interaction.commandName does not match any commands (>1 command)', () => {
-    slashCommandA.name = 'dummy1';
-    slashCommandB.name = 'dummy2';
-    slashCommandC.name = 'dummy3';
-    interaction.commandName = 'dummy';
-    doHandleSlashCommand([slashCommandA, slashCommandB, slashCommandC], client, interaction);
+  test('sends a message to channel if an exception is thrown while command is running', async () => {
+    const clientOnSpy = jest.spyOn(client, 'on');
+    const commandCollection = new Collection<string, Command>();
+    commandCollection.set('example', {
+      name: 'name', 
+      description: 'description',
+      run: async (_client, _interaction) => {
+        throw new Error();
+      }
+    });
+    addInteractionCreateEventToClient(client, commandCollection);
+    const clientOnCallbackFn = clientOnSpy.mock.calls[0][1];
+    await clientOnCallbackFn(interaction);
     expect(interaction.reply).toHaveBeenCalledTimes(1);
-    expect(interaction.reply).toHaveBeenCalledWith({ 
+    expect(interaction.reply).toHaveBeenCalledWith({
       content: expect.any(String),
-      ephemeral: expect.any(Boolean)
-    });
-    expect(slashCommandA.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandB.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandC.run).toHaveBeenCalledTimes(0);
-  });
-
-  test('calls interaction.reply correctly if interaction.commandName does not match any commands (=1 command)', () => {
-    slashCommandA.name = 'dummy1';
-    interaction.commandName = 'dummy';
-    doHandleSlashCommand([slashCommandA], client, interaction);
-    expect(interaction.reply).toHaveBeenCalledTimes(1);
-    expect(interaction.reply).toHaveBeenCalledWith({ 
-      content: expect.any(String),
-      ephemeral: expect.any(Boolean)
-    });
-    expect(slashCommandA.run).toHaveBeenCalledTimes(0);
-  });
-
-  test('executes correct run function if interaction.commandName matches multiple commands (slashCommandA.run)', () => {
-    slashCommandA.name = 'dummy1';
-    slashCommandB.name = 'dummy1';
-    slashCommandC.name = 'dummy1';
-    interaction.commandName = 'dummy1';
-    doHandleSlashCommand([slashCommandA, slashCommandB, slashCommandC], client, interaction);
-    expect(interaction.reply).toHaveBeenCalledTimes(0);
-    expect(slashCommandA.run).toHaveBeenCalledTimes(1);
-    expect(slashCommandB.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandC.run).toHaveBeenCalledTimes(0);
-  });
-
-  test('executes correct run function if interaction.commandName matches multiple commands (slashCommandB.run)', () => {
-    slashCommandA.name = 'dummy1';
-    slashCommandB.name = 'dummy1';
-    slashCommandC.name = 'dummy1';
-    interaction.commandName = 'dummy1';
-    doHandleSlashCommand([slashCommandB, slashCommandC, slashCommandA], client, interaction);
-    expect(interaction.reply).toHaveBeenCalledTimes(0);
-    expect(slashCommandA.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandB.run).toHaveBeenCalledTimes(1);
-    expect(slashCommandC.run).toHaveBeenCalledTimes(0);
-  });
-
-  test('executes correct run function if interaction.commandName matches multiple commands (slashCommandC.run)', () => {
-    slashCommandA.name = 'dummy1';
-    slashCommandB.name = 'dummy1';
-    slashCommandC.name = 'dummy1';
-    interaction.commandName = 'dummy1';
-    doHandleSlashCommand([slashCommandC, slashCommandB, slashCommandA], client, interaction);
-    expect(interaction.reply).toHaveBeenCalledTimes(0);
-    expect(slashCommandA.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandB.run).toHaveBeenCalledTimes(0);
-    expect(slashCommandC.run).toHaveBeenCalledTimes(1);
-  });
-
-  test('executes run function in success case', async () => {
-    slashCommandA.name = 'dummy1';
-    interaction.commandName = 'dummy1';
-    await doHandleSlashCommand([slashCommandA], client, interaction);
-    expect(interaction.reply).toHaveBeenCalledTimes(0);
-    expect(slashCommandA.run).toHaveBeenCalledTimes(1);
+      ephemeral: expect.any(Boolean),
+    });    
   });
 });

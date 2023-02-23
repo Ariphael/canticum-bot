@@ -1,11 +1,11 @@
 import * as discordJsVoice from '@discordjs/voice';
-import { executeConnect } from '../commands/connect';
+import { connect } from '../commands/connect';
 import { getClientMock } from '../mocks/mocks';
-import { MusicPlayer } from '../musicplayer/MusicPlayer';
 import { getChatInputCommandInteractionMock } from '../mocks/mocks';
 
 const discordJsVoiceConnectionMock = ({
   subscribe: jest.fn(),
+  destroy: jest.fn(),
   on: jest.fn(),
 } as unknown) as discordJsVoice.VoiceConnection;
 
@@ -17,18 +17,22 @@ jest.mock('@discordjs/voice', () => {
   };
 });
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('connect command', () => {
   const interaction = getChatInputCommandInteractionMock();
 
   const client = getClientMock();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test('calls joinVoiceChannel method from @discordjs/voice module to initiate a connection to voice channel (executeConnection called directly)', async () => {
+  test('initiates a connection to a voice channel', async () => {
     const joinVoiceChannelSpy = jest.spyOn(discordJsVoice, 'joinVoiceChannel');
-    await executeConnect(client, interaction);
+    await connect.run(client, interaction);
     expect(joinVoiceChannelSpy).toHaveBeenCalledTimes(1);
     expect(joinVoiceChannelSpy).toHaveBeenCalledWith({
       channelId: expect.any(Function),
@@ -37,17 +41,8 @@ describe('connect command', () => {
     });
   });
 
-  test('adds music player to voice connection subscriptions\'s by calling MusicPlayer\'s addToVoiceConnectionSubscriptions function', async () => {
-    const musicPlayerAddToVoiceConnectionSubscriptionsMock = 
-      jest.spyOn(MusicPlayer.prototype, 'addToVoiceConnectionSubscriptions');
-    await executeConnect(client, interaction);
-    expect(musicPlayerAddToVoiceConnectionSubscriptionsMock).toHaveBeenCalledTimes(1);
-    expect(musicPlayerAddToVoiceConnectionSubscriptionsMock)
-      .toHaveBeenCalledWith(discordJsVoiceConnectionMock);
-  });
-
-  test('calls interaction.reply upon connecting to a voice channel (executeConnection function directly called)', async () => {
-    await executeConnect(client, interaction);
+  test('sends message to channel', async () => {
+    await connect.run(client, interaction);
     expect(interaction.reply).toBeCalledTimes(1);
     expect(interaction.reply).toBeCalledWith({ 
       content: '', 

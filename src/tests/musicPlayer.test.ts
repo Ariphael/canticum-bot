@@ -147,7 +147,7 @@ describe('MusicPlayer', () => {
       subscribe: jest.fn(() => new PlayerSubscription(null, null)),
     } as unknown) as VoiceConnection;
     const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
-    expect(musicPlayerInstance.addToVoiceConnectionSubscriptions(voiceConnectionMock))
+    expect(musicPlayerInstance.addAudioPlayerToVoiceConnectionSubscriptions(voiceConnectionMock))
       .toBeInstanceOf(PlayerSubscription);
     expect(voiceConnectionMock.subscribe).toHaveBeenCalledTimes(1);
     expect(voiceConnectionMock.subscribe).toHaveBeenCalledWith(expect.any(AudioPlayer));
