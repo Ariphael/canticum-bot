@@ -2,8 +2,8 @@ import fs from 'fs';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { token } from './config.json';
 // const token = '0123456789'; // fake token
-import { ready } from './listeners/ready';
-import { interactionCreate } from './listeners/interactionCreate';
+import { addReadyEventToClient } from './events/ready';
+import { addInteractionCreateEventToClient } from './events/interactionCreate';
 import { Command } from './interfaces/command-interface';
 
 const client = new Client({
@@ -17,8 +17,8 @@ export const startCanticum = async (client: Client<boolean>) => {
   console.log('Bot is starting...');
 
   const commandCollection = await getCommands();
-  ready(client, commandCollection);
-  interactionCreate(client, commandCollection);
+  addReadyEventToClient(client, commandCollection);
+  addInteractionCreateEventToClient(client, commandCollection);
 
   await client.login(token);
 };
