@@ -3,27 +3,23 @@ export const commandData = [{
   commandDescription: 'Displays list of commands or information about command', 
   commandOptions: 'help (command)', 
 }, {
-  commandName: 'connect [target]', 
-  commandDescription: 'Conncects to a voice channel. If no specific voice channel target is stated, then it joins a voice channel named "Music Canticum"',
-  commandOptions: 'connect', 
+  commandName: 'connect', 
+  commandDescription: 'Connects to a target voice channel.',
+  commandOptions: 'connect [target]', 
 }, {
   commandName: 'disconnect', 
-  commandDescription: 'Clears the queue and disconnects from target voice channel. Music must not be playing and user calling command must have control over queue for this command to work.',
+  commandDescription: 'Disconnects from target voice channel.',
   commandOptions: 'disconnect',
-}, {
-  commandName: 'addqueue', 
-  commandDescription: 'Adds a song to a queue.', 
-  commandOptions: 'addqueue <link>',
-}, {
-  commandName: 'rmqueue', 
-  commandDescription: 'Removes specific song from queue. The position of a song in the queue is determined by a unique id. Use /queue to display information about the queue.',
-  commandOptions: 'rmqueue <id>',
 }, {
   commandName: 'queue', 
   commandDescription: 'Displays information about queue.',
   commandOptions: 'queue',
 }, {
-  commandName: 'toggleplay',
-  commandDescription: 'Play/pause music. Bot must be connected to a voice channel and queue must not be empty.', 
-  commandOptions: 'toggleplay',
+  commandName: 'play',
+  commandDescription: 'Plays/adds music to the queue. Searches on youtube. Bot must be connected to a voice channel.', 
+  commandOptions: 'play [query]',
+}, {
+  commandName: 'clear',
+  commandDescription: 'clears queue', 
+  commandOptions: 'clear'  
 }]
