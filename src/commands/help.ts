@@ -1,7 +1,6 @@
 import { Command } from '../interfaces/command-interface';
 import { embeds, getCommandEmbed } from '../embeds/helpEmbeds';
-import { buttons } from '../buttons/buttons';
-import { helpButtonId } from '../buttons/buttonIdData.json';
+import { helpButtons } from '../buttons/help.buttons';
 import { 
   ApplicationCommandOptionType, 
   CacheType, 
@@ -10,7 +9,7 @@ import {
   EmbedBuilder
 } from 'discord.js';
 
-export const Help: Command = {
+export const help: Command = {
   name: 'help', 
   description: 'displays list of commands',
   options: [{
@@ -27,13 +26,11 @@ export const Help: Command = {
 const executeHelp = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   if (interaction.options.get('command')) {
     const commandEmbed: EmbedBuilder = getCommandEmbed(interaction.options.getString('command'));
-    await interaction.editReply({ content: '', components: [], embeds: [commandEmbed]});
+    await interaction.reply({ content: '', components: [], embeds: [commandEmbed]});
     return;
   } 
-  
-  const helpButton = buttons.find(b => b.buttonId === helpButtonId);
 
-  helpButton.handleInteraction(interaction.channel);
+  helpButtons.handleInteraction(interaction.channel);
 
-  await interaction.reply({ content: '', components: [helpButton.row], embeds: [embeds[0]] });
+  await interaction.reply({ content: '', components: [helpButtons.row], embeds: [embeds[0]] });
 };

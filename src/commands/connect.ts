@@ -10,7 +10,7 @@ import {
 import { entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
 
-export const Connect: Command = {
+export const connect: Command = {
   name: 'connect',
   description: 'Connect to voice channel',
   options: [{
@@ -36,22 +36,8 @@ const executeConnect = async (_client: Client, interaction: ChatInputCommandInte
     adapterCreator: interaction.guild.voiceAdapterCreator,
   });
 
-  // Imperfect workaround to the issue where the bot has not moved voice channels and
-  // entered a real disconnect scenario shown in the official discord.js guide
-  voiceConnection.on(VoiceConnectionStatus.Disconnected, async (_oldState, _newState) => {
-    try {
-      await Promise.race([
-        entersState(voiceConnection, VoiceConnectionStatus.Signalling, 5_000),
-        entersState(voiceConnection, VoiceConnectionStatus.Connecting, 5_000),
-      ]);
-      // Seems to be reconnecting to a new channel - ignore disconnect
-    } catch (error) {
-      // Seems to be a real disconnect which SHOULDN'T be recovered from
-      voiceConnection.destroy();
-    }
-  });
-
-  MusicPlayer.getMusicPlayerInstance().addToVoiceConnectionSubscriptions(voiceConnection);
+  MusicPlayer.getMusicPlayerInstance()
+    .addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection);
   embed.setDescription(`Connected to voice channel ${requestedChannel.name}`);
   await interaction.reply({ content: '', components: [], embeds: [embed] });
 };

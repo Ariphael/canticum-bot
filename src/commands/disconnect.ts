@@ -7,7 +7,7 @@ import {
 } from 'discord.js';
 import { getVoiceConnection, VoiceConnection } from '@discordjs/voice';
 
-export const Disconnect: Command = {
+export const disconnect: Command = {
   name: 'disconnect',
   description: 'Disconnect from voice channel',
   run: async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {

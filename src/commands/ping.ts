@@ -1,6 +1,4 @@
 import { Command } from '../interfaces/command-interface';
-import { buttons } from '../buttons/buttons';
-import { pingOkButtonId } from '../buttons/buttonIdData.json';
 import { 
   CacheType, 
   ChatInputCommandInteraction, 
