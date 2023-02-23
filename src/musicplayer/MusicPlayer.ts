@@ -51,7 +51,7 @@ class MusicPlayer {
     return this.audioResourceState.resourceSetVolume(volume);
   }
 
-  public addToVoiceConnectionSubscriptions(voiceConnection: VoiceConnection): PlayerSubscription {
+  public addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection: VoiceConnection): PlayerSubscription {
     return voiceConnection.subscribe(this.audioPlayer);
   }
 
