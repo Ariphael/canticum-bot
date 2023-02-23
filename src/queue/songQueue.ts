@@ -13,19 +13,21 @@ export const dequeue = (): {musicTitle: String, musicId: String} | undefined => 
   return musicQueue.shift();
 }
 
-export const swapQueuePositions = (positionA: number, positionB: number): MusicQueueItemType[] => {
+export const swapQueuePositions = (positionA: number, positionB: number): boolean => {
   if (positionA < 0 || positionB < 0) {
-    console.log("Error: swapQueuePositions called with positionA < 0 or positionB < 0");
-    return null;
+    return false;
+  } else if (musicQueue.at(positionA) === undefined || musicQueue.at(positionB) === undefined) {
+    return false;
   }
+
   const tempMusicQueueValue = musicQueue[positionA];
   musicQueue[positionA] = musicQueue[positionB];
   musicQueue[positionB] = tempMusicQueueValue;
-  return musicQueue;
+  return true;
 }
 
-export const musicQueueForEach = (callbackFn: (value: MusicQueueItemType, index: number) => void) => {
-  musicQueue.forEach(callbackFn);
+export const getMusicQueueIterator = () => {
+  return musicQueue.values();
 }
 
 export const getMusicQueueItem = (index: number) => {
@@ -34,10 +36,6 @@ export const getMusicQueueItem = (index: number) => {
 
 export const getMusicQueueLength = (): number => {
   return musicQueue.length;
-}
-
-export const getMusicQueue = (): MusicQueueItemType[] => {
-  return musicQueue;
 }
 
 export const clearQueue = (): MusicQueueItemType[] => {
