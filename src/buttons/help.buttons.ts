@@ -1,6 +1,5 @@
-import { Button, HelpPageInfo } from './button-interface';
+import { Button, HelpPageInfo } from '../interfaces/button-interface';
 import { numPages, embeds } from '../embeds/helpEmbeds';
-import { prevButtonId, nextButtonId, helpButtonId } from './buttonIdData.json';
 import { 
   ActionRowBuilder, 
   CacheType, 
@@ -17,6 +16,9 @@ const pageInfo: HelpPageInfo = {
   maxPage: numPages,
 }
 
+const prevButtonId = 'prevButton';
+const nextButtonId = 'nextButton';
+
 const helpButtonRow = (
   new ActionRowBuilder<ButtonBuilder>()
     .addComponents([
@@ -24,49 +26,36 @@ const helpButtonRow = (
         .setCustomId(prevButtonId)
         .setLabel('PREV')
         .setStyle(ButtonStyle.Secondary)
-        .setDisabled(pageInfo.page === 1 ? true : false),
+        .setDisabled(true),
       new ButtonBuilder()
         .setCustomId(nextButtonId)
         .setLabel('NEXT')
         .setStyle(ButtonStyle.Secondary)
-        .setDisabled(pageInfo.page === pageInfo.maxPage ? true : false)
+        .setDisabled(false)
     ])
 );
 
 export const helpButtons: Button = {
-  buttonId: helpButtonId, 
+  buttonId: [prevButtonId, nextButtonId], 
   row: helpButtonRow,
-  handleInteraction: async (channel: GuildTextBasedChannel): Promise<void> => {
-    await executeHelpButton(helpButtonRow.components, pageInfo, channel);
+  handleInteraction: (channel: GuildTextBasedChannel) => {
+    executeHelpButton(helpButtonRow.components, pageInfo, channel);
   }
 }
 
-export const updateButtonMessage = async (components: ButtonBuilder[], pageInfo: HelpPageInfo, i: MessageComponentInteraction<CacheType>) => {
-  const prevButtonComponent = components[0]; 
-  const nextButtonComponent = components[1];
+export const getPageNumber = (): number => {
+  return pageInfo.page;
+};
 
-  if (i.customId === prevButtonId) {
-    pageInfo.page -= 1;
-    nextButtonComponent.setDisabled(false);
-    if (pageInfo.page === 1) {
-      prevButtonComponent.setDisabled(true);
-    }
-  } else if (i.customId === nextButtonId) {
-    pageInfo.page += 1; 
-    prevButtonComponent.setDisabled(false);
-    if (pageInfo.page === pageInfo.maxPage) {
-      nextButtonComponent.setDisabled(true);
-    }
-  }
-
-  await i.update({ 
-    content: '', 
-    components: [helpButtonRow], 
-    embeds: [embeds[pageInfo.page - 1]] 
-  });
+export const resetPageNumber = (): number => {
+  return pageInfo.page = 1;
 }
 
-export const executeHelpButton = async (components: ButtonBuilder[], pageInfo: HelpPageInfo, channel: GuildTextBasedChannel) => {
+export const getNumPages = (): number => {
+  return pageInfo.maxPage;
+}
+
+const executeHelpButton = (components: ButtonBuilder[], pageInfo: HelpPageInfo, channel: GuildTextBasedChannel) => {
   const filter: CollectorFilter<[ButtonInteraction<"cached">]> = (
     ( i: MessageComponentInteraction<CacheType> ) => {
       return i.customId === prevButtonId || i.customId === nextButtonId;
@@ -79,3 +68,24 @@ export const executeHelpButton = async (components: ButtonBuilder[], pageInfo: H
     await updateButtonMessage(components, pageInfo, i);
   });
 };
+
+const updateButtonMessage = async (components: ButtonBuilder[], pageInfo: HelpPageInfo, i: MessageComponentInteraction<CacheType>) => {
+  const prevButtonComponent = components[0]; 
+  const nextButtonComponent = components[1];
+
+  if (i.customId === prevButtonId) {
+    pageInfo.page -= 1;
+    nextButtonComponent.setDisabled(false);
+    prevButtonComponent.setDisabled(pageInfo.page === 1);
+  } else if (i.customId === nextButtonId) {
+    pageInfo.page += 1; 
+    prevButtonComponent.setDisabled(false);
+    nextButtonComponent.setDisabled(pageInfo.page === pageInfo.maxPage);
+  }
+
+  await i.update({ 
+    content: '', 
+    components: [helpButtonRow], 
+    embeds: [embeds[pageInfo.page - 1]] 
+  });
+}
