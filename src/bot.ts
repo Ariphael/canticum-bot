@@ -26,7 +26,7 @@ export const startCanticum = async (client: Client<boolean>) => {
 const getCommands = async (): Promise<Collection<string, Command>> => {
   const commandCollection = new Collection<string, Command>();
 
-  const commandFiles = fs.readdirSync("./src/commands").filter((file) => file.endsWith(".ts"));
+  const commandFiles = fs.readdirSync('./src/commands').filter((file) => file.endsWith('.ts'));
 
   commandFiles.forEach((commandFile) => {
     const command: { commandData: Command } = require(`./commands/${commandFile}`);
