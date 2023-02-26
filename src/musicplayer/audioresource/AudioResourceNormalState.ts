@@ -5,9 +5,9 @@ import {
   createAudioResource 
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
-import { dequeue } from '../queue/songQueue';
+import { dequeue } from '../../queue/songQueue';
 import { AudioResourceState } from './AudioResourceState';
-import { MusicQueueItemType } from '../types/musicQueueItem';
+import { MusicQueueItemType } from '../../types/musicQueueItem';
 
 export { AudioResourceNormalState };
 
@@ -17,6 +17,7 @@ class AudioResourceNormalState implements AudioResourceState {
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
     audioPlayer.on(AudioPlayerStatus.Idle, () => {
+      this.currentPlayingMusicQueueItem = null;
       if (!this.doPlayAudio(audioPlayer)) {
         audioPlayer.stop();
       }
@@ -28,6 +29,10 @@ class AudioResourceNormalState implements AudioResourceState {
     return this.currentPlayingMusicQueueItem;
   }
 
+  public setCurrentPlayingSong(musicQueueItem: MusicQueueItemType): MusicQueueItemType {
+    return this.currentPlayingMusicQueueItem = musicQueueItem;
+  }
+
   public resourceSetVolume(volume: number): boolean {
     if (volume < 0 || this.audioResource === null) {
       return false;
@@ -37,7 +42,9 @@ class AudioResourceNormalState implements AudioResourceState {
   }
 
   private doPlayAudio(audioPlayer: AudioPlayer) {
-    const nextMusicQueueItem = this.currentPlayingMusicQueueItem = dequeue();
+    const nextMusicQueueItem = this.currentPlayingMusicQueueItem === null
+      ? this.currentPlayingMusicQueueItem = dequeue()
+      : this.currentPlayingMusicQueueItem;
     if (nextMusicQueueItem !== undefined) {
       this.audioResource = createAudioResource(
         ytdl(`https://www.youtube.com/watch?v=${nextMusicQueueItem.musicId}`, { 

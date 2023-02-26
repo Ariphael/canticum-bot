@@ -5,14 +5,13 @@ import {
   createAudioResource 
 } from "@discordjs/voice";
 import ytdl from "ytdl-core";
-import { dequeue } from "../queue/songQueue";
-import { MusicQueueItemType } from "../types/musicQueueItem";
-import { AudioResourceLoopState } from "./AudioResourceLoopState";
+import { dequeue } from "../../queue/songQueue";
+import { MusicQueueItemType } from "../../types/musicQueueItem";
 import { AudioResourceState } from "./AudioResourceState";
 
 export { AudioResourceLoopCurrSongState };
 
-class AudioResourceLoopCurrSongState implements AudioResourceLoopState {
+class AudioResourceLoopCurrSongState implements AudioResourceState {
   private audioResource: AudioResource = null;
   private currentPlayingMusicQueueItem: MusicQueueItemType = null;
 

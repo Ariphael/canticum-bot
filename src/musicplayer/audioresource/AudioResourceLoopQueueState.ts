@@ -1,19 +1,19 @@
 import { AudioResource, AudioPlayer, AudioPlayerStatus, createAudioResource } from "@discordjs/voice";
 import ytdl from "ytdl-core";
-import { getMusicQueueIterator } from "../queue/songQueue";
-import { MusicQueueItemType } from "../types/musicQueueItem";
-import { AudioResourceLoopState } from "./AudioResourceLoopState";
+import { getMusicQueueIterator } from "../../queue/songQueue";
+import { MusicQueueItemType } from "../../types/musicQueueItem";
 import { AudioResourceState } from "./AudioResourceState";
 
 export { AudioResourceLoopQueueState };
 
-class AudioResourceLoopQueueState implements AudioResourceLoopState {
+class AudioResourceLoopQueueState implements AudioResourceState {
   private audioResource: AudioResource = null;
   private currentPlayingMusicQueueItem: MusicQueueItemType = null;
   private musicQueueIterator = getMusicQueueIterator();
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
     audioPlayer.on(AudioPlayerStatus.Idle, () => {
+      this.currentPlayingMusicQueueItem = null;
       if (!this.doPlayAudio(audioPlayer)) {
         audioPlayer.stop();
       }

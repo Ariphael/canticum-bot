@@ -5,21 +5,14 @@ import {
   PlayerSubscription, 
   VoiceConnection 
 } from "@discordjs/voice";
-import { AudioResourceState } from './AudioResourceState';
-import { AudioResourceNormalState } from "./AudioResourceNormalState";
-import { AudioResourceLoopCurrSongState } from "./AudioResourceLoopCurrSongState";
-import { AudioResourceLoopQueueState } from "./AudioResourceLoopQueueState";
+import { AudioResourceManager } from "./audioresource/AudioResourceManager";
 
 export { MusicPlayer };
 
 class MusicPlayer {
   static musicPlayerSingletonInstance: MusicPlayer = null;
   private audioPlayer: AudioPlayer;
-
-  private audioResourceNormalState: AudioResourceNormalState;
-  private audioResourceLoopCurrSongState: AudioResourceLoopCurrSongState;
-  private audioResourceLoopQueueState: AudioResourceLoopQueueState;
-  private audioResourceState: AudioResourceState;
+  private audioResourceManager: AudioResourceManager;
 
   constructor() {
     this.audioPlayer = createAudioPlayer({
@@ -27,14 +20,11 @@ class MusicPlayer {
         noSubscriber: NoSubscriberBehavior.Pause,
       },
     });
-    this.audioResourceNormalState = new AudioResourceNormalState();
-    this.audioResourceLoopCurrSongState = new AudioResourceLoopCurrSongState();
-    this.audioResourceLoopQueueState = new AudioResourceLoopQueueState();
-    this.audioResourceState = this.audioResourceNormalState;
+    this.audioResourceManager = new AudioResourceManager();
   }
 
   public playAudio(): boolean {
-    return this.audioResourceState.playAudio(this.audioPlayer);
+    return this.audioResourceManager.playAudio(this.audioPlayer);
   }
   
   public stopAudioPlayer(): boolean {
@@ -54,11 +44,23 @@ class MusicPlayer {
   }
 
   public setVolume(volume: number): boolean {
-    return this.audioResourceState.resourceSetVolume(volume);
+    return this.audioResourceManager.resourceSetVolume(volume);
   }
 
   public addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection: VoiceConnection): PlayerSubscription {
     return voiceConnection.subscribe(this.audioPlayer);
+  }
+
+  public switchToLoopCurrSongState() {
+    this.audioResourceManager.switchToLoopCurrSongState();
+  }
+
+  public switchToLoopQueueState() {
+    this.audioResourceManager.switchToLoopQueueState();
+  }
+
+  public switchToNormalState() {
+    this.audioResourceManager.switchToNormalState();
   }
 
   public static getMusicPlayerInstance() {
