@@ -27,21 +27,28 @@ class AudioResourceManager {
     return this.audioResourceState.resourceSetVolume(volume);
   }
 
+  public clearCachedMusicQueueItem() {
+    this.audioResourceState.setCurrentPlayingSong(null);
+  }
+
   public switchToLoopCurrSongState() {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
     this.audioResourceLoopCurrSongState.setCurrentPlayingSong(currentPlayingSongInfo);
+    this.audioResourceLoopCurrSongState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceLoopCurrSongState;
   }
 
   public switchToLoopQueueState() {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
     this.audioResourceLoopQueueState.setCurrentPlayingSong(currentPlayingSongInfo);
+    this.audioResourceLoopCurrSongState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceLoopQueueState;
   }
 
   public switchToNormalState() {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
     this.audioResourceNormalState.setCurrentPlayingSong(currentPlayingSongInfo);
+    this.audioResourceLoopCurrSongState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceNormalState;    
   }
 }
