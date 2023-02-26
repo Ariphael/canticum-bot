@@ -33,8 +33,4 @@ describe('clear command', () => {
       embeds: expect.any(Object),
     })
   });
-
-  test('sends a message to channel if queue is not cleared', async () => {
-
-  });
 });
