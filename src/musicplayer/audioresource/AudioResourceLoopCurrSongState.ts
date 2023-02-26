@@ -16,11 +16,11 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
   private currentPlayingMusicQueueItem: MusicQueueItemType = null;
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
-    audioPlayer.on(AudioPlayerStatus.Idle, () => {
-      if (!this.doPlayAudio(audioPlayer)) {
-        audioPlayer.stop();
-      }
-    });
+    if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) < 1) {
+      audioPlayer.on(AudioPlayerStatus.Idle, () => {
+        if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
+      });
+    }
     return this.doPlayAudio(audioPlayer);
   };
 

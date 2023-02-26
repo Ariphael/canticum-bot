@@ -16,12 +16,13 @@ class AudioResourceNormalState implements AudioResourceState {
   private currentPlayingMusicQueueItem: MusicQueueItemType = null;
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
-    audioPlayer.on(AudioPlayerStatus.Idle, () => {
-      this.currentPlayingMusicQueueItem = null;
-      if (!this.doPlayAudio(audioPlayer)) {
-        audioPlayer.stop();
-      }
-    });
+    if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) < 1) {
+      audioPlayer.on(AudioPlayerStatus.Idle, () => {
+        this.currentPlayingMusicQueueItem = null;
+        if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
+      });
+    }
+    
     return this.doPlayAudio(audioPlayer);
   }
 
@@ -43,8 +44,9 @@ class AudioResourceNormalState implements AudioResourceState {
 
   private doPlayAudio(audioPlayer: AudioPlayer) {
     const nextMusicQueueItem = this.currentPlayingMusicQueueItem === null
-      ? this.currentPlayingMusicQueueItem = dequeue()
+      ? dequeue()
       : this.currentPlayingMusicQueueItem;
+
     if (nextMusicQueueItem !== undefined) {
       this.audioResource = createAudioResource(
         ytdl(`https://www.youtube.com/watch?v=${nextMusicQueueItem.musicId}`, { 
@@ -58,6 +60,7 @@ class AudioResourceNormalState implements AudioResourceState {
          }
       );
       audioPlayer.play(this.audioResource);
+      this.currentPlayingMusicQueueItem = nextMusicQueueItem;
       return true;
     }
     return false;

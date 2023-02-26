@@ -12,12 +12,12 @@ class AudioResourceLoopQueueState implements AudioResourceState {
   private musicQueueIterator = getMusicQueueIterator();
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
-    audioPlayer.on(AudioPlayerStatus.Idle, () => {
-      this.currentPlayingMusicQueueItem = null;
-      if (!this.doPlayAudio(audioPlayer)) {
-        audioPlayer.stop();
-      }
-    });
+    if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) < 1) {
+      audioPlayer.on(AudioPlayerStatus.Idle, () => {
+        this.currentPlayingMusicQueueItem = null;
+        if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
+      });
+    }
 
     return this.doPlayAudio(audioPlayer);
   };
