@@ -1,4 +1,4 @@
-type MusicQueueItemType = { musicTitle: String, musicId: String };
+import { MusicQueueItemType } from "../types/musicQueueItem";
 
 const musicQueue: MusicQueueItemType[] = [];
 
