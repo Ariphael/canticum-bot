@@ -7,11 +7,13 @@ import {
 import ytdl from 'ytdl-core';
 import { dequeue } from '../queue/songQueue';
 import { AudioResourceState } from './AudioResourceState';
+import { MusicQueueItemType } from '../types/musicQueueItem';
 
 export { AudioResourceNormalState };
 
 class AudioResourceNormalState implements AudioResourceState {
   private audioResource: AudioResource = null;
+  private currentPlayingMusicQueueItem: MusicQueueItemType = null;
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
     audioPlayer.on(AudioPlayerStatus.Idle, () => {
@@ -20,6 +22,10 @@ class AudioResourceNormalState implements AudioResourceState {
       }
     });
     return this.doPlayAudio(audioPlayer);
+  }
+
+  public getCurrentPlayingSongInfo(): MusicQueueItemType {
+    return this.currentPlayingMusicQueueItem;
   }
 
   public resourceSetVolume(volume: number): boolean {
@@ -31,7 +37,7 @@ class AudioResourceNormalState implements AudioResourceState {
   }
 
   private doPlayAudio(audioPlayer: AudioPlayer) {
-    const nextMusicQueueItem = dequeue();
+    const nextMusicQueueItem = this.currentPlayingMusicQueueItem = dequeue();
     if (nextMusicQueueItem !== undefined) {
       this.audioResource = createAudioResource(
         ytdl(`https://www.youtube.com/watch?v=${nextMusicQueueItem.musicId}`, { 

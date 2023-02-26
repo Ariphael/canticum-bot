@@ -7,6 +7,8 @@ import {
 } from "@discordjs/voice";
 import { AudioResourceState } from './AudioResourceState';
 import { AudioResourceNormalState } from "./AudioResourceNormalState";
+import { AudioResourceLoopCurrSongState } from "./AudioResourceLoopCurrSongState";
+import { AudioResourceLoopQueueState } from "./AudioResourceLoopQueueState";
 
 export { MusicPlayer };
 
@@ -15,6 +17,8 @@ class MusicPlayer {
   private audioPlayer: AudioPlayer;
 
   private audioResourceNormalState: AudioResourceNormalState;
+  private audioResourceLoopCurrSongState: AudioResourceLoopCurrSongState;
+  private audioResourceLoopQueueState: AudioResourceLoopQueueState;
   private audioResourceState: AudioResourceState;
 
   constructor() {
@@ -24,6 +28,8 @@ class MusicPlayer {
       },
     });
     this.audioResourceNormalState = new AudioResourceNormalState();
+    this.audioResourceLoopCurrSongState = new AudioResourceLoopCurrSongState();
+    this.audioResourceLoopQueueState = new AudioResourceLoopQueueState();
     this.audioResourceState = this.audioResourceNormalState;
   }
 
