@@ -28,6 +28,7 @@ class MusicPlayer {
   }
   
   public stopAudioPlayer(): boolean {
+    this.audioResourceManager.clearCachedMusicQueueItem();
     return this.audioPlayer.stop();
   }
 
