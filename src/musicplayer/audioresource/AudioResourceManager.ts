@@ -1,4 +1,5 @@
 import { AudioPlayer } from "@discordjs/voice";
+import { MusicQueueItemType } from "../../types/musicQueueItem";
 import { AudioResourceLoopCurrSongState } from "./AudioResourceLoopCurrSongState";
 import { AudioResourceLoopQueueState } from "./AudioResourceLoopQueueState";
 import { AudioResourceNormalState } from "./AudioResourceNormalState";
@@ -20,7 +21,8 @@ class AudioResourceManager {
   }
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
-    return this.audioResourceState.playAudio(audioPlayer);
+    return this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer) 
+      && this.audioResourceState.playAudio(audioPlayer);
   }
 
   public resourceSetVolume(volume: number): boolean {
@@ -31,24 +33,36 @@ class AudioResourceManager {
     this.audioResourceState.setCurrentPlayingSong(null);
   }
 
-  public switchToLoopCurrSongState() {
+  public getCurrentPlayingSongInfo(): MusicQueueItemType {
+    return this.audioResourceState.getCurrentPlayingSongInfo();
+  }
+
+  public isLoopingOn(): boolean {
+    return this.audioResourceState instanceof AudioResourceLoopQueueState
+      || this.audioResourceState instanceof AudioResourceLoopCurrSongState;
+  }
+
+  public switchToLoopCurrSongState(audioPlayer: AudioPlayer) {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
     this.audioResourceLoopCurrSongState.setCurrentPlayingSong(currentPlayingSongInfo);
-    this.audioResourceLoopCurrSongState.setCurrentPlayingSong(null);
+    this.audioResourceState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceLoopCurrSongState;
+    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
   }
 
-  public switchToLoopQueueState() {
+  public switchToLoopQueueState(audioPlayer: AudioPlayer) {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
     this.audioResourceLoopQueueState.setCurrentPlayingSong(currentPlayingSongInfo);
-    this.audioResourceLoopCurrSongState.setCurrentPlayingSong(null);
+    this.audioResourceState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceLoopQueueState;
+    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
   }
 
-  public switchToNormalState() {
+  public switchToNormalState(audioPlayer: AudioPlayer) {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
     this.audioResourceNormalState.setCurrentPlayingSong(currentPlayingSongInfo);
-    this.audioResourceLoopCurrSongState.setCurrentPlayingSong(null);
+    this.audioResourceState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceNormalState;    
+    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
   }
 }

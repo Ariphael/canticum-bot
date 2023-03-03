@@ -12,15 +12,10 @@ import { AudioResourceState } from "./AudioResourceState";
 export { AudioResourceLoopCurrSongState };
 
 class AudioResourceLoopCurrSongState implements AudioResourceState {
-  private audioResource: AudioResource = null;
-  private currentPlayingMusicQueueItem: MusicQueueItemType = null;
+  private audioResource: AudioResource = undefined;
+  private currentPlayingMusicQueueItem: MusicQueueItemType = undefined;
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
-    if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) < 1) {
-      audioPlayer.on(AudioPlayerStatus.Idle, () => {
-        if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
-      });
-    }
     return this.doPlayAudio(audioPlayer);
   };
 
@@ -32,12 +27,19 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
     return true;
   }
 
-  public getCurrentPlayingSongInfo(): MusicQueueItemType {
+  public getCurrentPlayingSongInfo(): MusicQueueItemType | undefined {
     return this.currentPlayingMusicQueueItem;
   }
 
   public setCurrentPlayingSong(musicQueueItem: MusicQueueItemType): MusicQueueItemType {
     return this.currentPlayingMusicQueueItem = musicQueueItem;
+  }
+
+  public setAudioPlayerStatusIdleListener(audioPlayer: AudioPlayer): AudioPlayer | undefined {
+    if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) >= 1) return undefined;
+    return audioPlayer.on(AudioPlayerStatus.Idle, () => {
+      if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
+    });  
   }
 
   private doPlayAudio(audioPlayer: AudioPlayer): boolean {

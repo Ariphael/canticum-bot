@@ -1,10 +1,12 @@
 import { 
   AudioPlayer, 
+  AudioPlayerStatus, 
   createAudioPlayer, 
   NoSubscriberBehavior, 
   PlayerSubscription, 
   VoiceConnection 
 } from "@discordjs/voice";
+import { MusicQueueItemType } from "../types/musicQueueItem";
 import { AudioResourceManager } from "./audioresource/AudioResourceManager";
 
 export { MusicPlayer };
@@ -52,16 +54,27 @@ class MusicPlayer {
     return voiceConnection.subscribe(this.audioPlayer);
   }
 
+  public getCurrentPlayingSongInfo(): MusicQueueItemType {
+    return this.audioResourceManager.getCurrentPlayingSongInfo();
+  }
+
+  public isLoopingOn(): boolean {
+    return this.audioResourceManager.isLoopingOn();
+  }
+
   public switchToLoopCurrSongState() {
-    this.audioResourceManager.switchToLoopCurrSongState();
+    this.audioPlayer.removeAllListeners(AudioPlayerStatus.Idle);
+    this.audioResourceManager.switchToLoopCurrSongState(this.audioPlayer);
   }
 
   public switchToLoopQueueState() {
-    this.audioResourceManager.switchToLoopQueueState();
+    this.audioPlayer.removeAllListeners(AudioPlayerStatus.Idle);
+    this.audioResourceManager.switchToLoopQueueState(this.audioPlayer);
   }
 
   public switchToNormalState() {
-    this.audioResourceManager.switchToNormalState();
+    this.audioPlayer.removeAllListeners(AudioPlayerStatus.Idle);
+    this.audioResourceManager.switchToNormalState(this.audioPlayer);
   }
 
   public static getMusicPlayerInstance() {

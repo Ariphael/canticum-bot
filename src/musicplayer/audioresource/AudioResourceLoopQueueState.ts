@@ -1,33 +1,34 @@
 import { AudioResource, AudioPlayer, AudioPlayerStatus, createAudioResource } from "@discordjs/voice";
 import ytdl from "ytdl-core";
-import { getMusicQueueIterator } from "../../queue/songQueue";
+import { getMusicQueueIterator, getMusicQueueLength } from "../../queue/songQueue";
 import { MusicQueueItemType } from "../../types/musicQueueItem";
 import { AudioResourceState } from "./AudioResourceState";
 
 export { AudioResourceLoopQueueState };
 
 class AudioResourceLoopQueueState implements AudioResourceState {
-  private audioResource: AudioResource = null;
-  private currentPlayingMusicQueueItem: MusicQueueItemType = null;
+  private audioResource: AudioResource = undefined;
+  private currentPlayingMusicQueueItem: MusicQueueItemType = undefined;
   private musicQueueIterator = getMusicQueueIterator();
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
-    if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) < 1) {
-      audioPlayer.on(AudioPlayerStatus.Idle, () => {
-        this.currentPlayingMusicQueueItem = null;
-        if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
-      });
-    }
-
     return this.doPlayAudio(audioPlayer);
   };
 
-  public getCurrentPlayingSongInfo(): MusicQueueItemType {
+  public getCurrentPlayingSongInfo(): MusicQueueItemType | undefined {
     return this.currentPlayingMusicQueueItem;
   }
 
   public setCurrentPlayingSong(musicQueueItem: MusicQueueItemType): MusicQueueItemType {
     return this.currentPlayingMusicQueueItem = musicQueueItem;
+  }
+
+  public setAudioPlayerStatusIdleListener(audioPlayer: AudioPlayer): AudioPlayer | undefined {
+    if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) >= 1) return undefined;
+    return audioPlayer.on(AudioPlayerStatus.Idle, () => {
+      this.currentPlayingMusicQueueItem = null;
+      if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
+    });  
   }
 
   public resourceSetVolume(volume: number): boolean {
@@ -38,7 +39,9 @@ class AudioResourceLoopQueueState implements AudioResourceState {
     return true;
   }
 
-  private doPlayAudio(audioPlayer: AudioPlayer) {
+  private doPlayAudio(audioPlayer: AudioPlayer): boolean {
+    if (getMusicQueueLength() === 0) return false;
+
     if (this.currentPlayingMusicQueueItem === null) {
       let nextMusicQueueItem = this.musicQueueIterator.next();
       if (nextMusicQueueItem.done) {
