@@ -12,8 +12,15 @@ import { MusicQueueItemType } from '../../types/musicQueueItem';
 export { AudioResourceNormalState };
 
 class AudioResourceNormalState implements AudioResourceState {
-  private audioResource: AudioResource = undefined;
-  private currentPlayingMusicQueueItem: MusicQueueItemType = undefined;
+  private audioResource: AudioResource;
+  private currentPlayingMusicQueueItem: MusicQueueItemType;
+  private resourceVolume: number;
+
+  constructor() {
+    this.audioResource = undefined;
+    this.currentPlayingMusicQueueItem = undefined;
+    this.resourceVolume = 0.5;
+  }
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
     return this.doPlayAudio(audioPlayer);
@@ -36,15 +43,20 @@ class AudioResourceNormalState implements AudioResourceState {
   }
 
   public resourceSetVolume(volume: number): boolean {
-    if (volume < 0 || this.audioResource === null) {
+    if (volume < 0 || this.audioResource === undefined) {
       return false;
     }
+    this.resourceVolume = volume;
     this.audioResource.volume.setVolume(volume);
     return true;
   }
 
+  public getResourceVolume(): number {
+    return this.resourceVolume;
+  }
+
   private doPlayAudio(audioPlayer: AudioPlayer) {
-    const nextMusicQueueItem = this.currentPlayingMusicQueueItem === null
+    const nextMusicQueueItem = this.currentPlayingMusicQueueItem === undefined
       ? dequeue()
       : this.currentPlayingMusicQueueItem;
 
@@ -60,6 +72,7 @@ class AudioResourceNormalState implements AudioResourceState {
           inlineVolume: true,
          }
       );
+      this.audioResource.volume.setVolume(this.resourceVolume);
       audioPlayer.play(this.audioResource);
       this.currentPlayingMusicQueueItem = nextMusicQueueItem;
       return true;

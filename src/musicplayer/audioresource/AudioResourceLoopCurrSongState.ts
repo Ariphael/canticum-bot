@@ -12,8 +12,15 @@ import { AudioResourceState } from "./AudioResourceState";
 export { AudioResourceLoopCurrSongState };
 
 class AudioResourceLoopCurrSongState implements AudioResourceState {
-  private audioResource: AudioResource = undefined;
-  private currentPlayingMusicQueueItem: MusicQueueItemType = undefined;
+  private audioResource: AudioResource;
+  private currentPlayingMusicQueueItem: MusicQueueItemType;
+  private resourceVolume: number;
+
+  constructor() {
+    this.audioResource = undefined;
+    this.currentPlayingMusicQueueItem = undefined;
+    this.resourceVolume = 0.5;
+  }
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
     return this.doPlayAudio(audioPlayer);
@@ -23,8 +30,13 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
     if (volume < 0 || this.audioResource === null) {
       return false;
     }
+    this.resourceVolume = volume;
     this.audioResource.volume.setVolume(volume);
     return true;
+  }
+
+  public getResourceVolume(): number {
+    return this.resourceVolume;
   }
 
   public getCurrentPlayingSongInfo(): MusicQueueItemType | undefined {
@@ -58,7 +70,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
        inlineVolume: true,
       }
     );
-    
+    this.audioResource.volume.setVolume(this.resourceVolume);
     try {
       audioPlayer.play(this.audioResource);
     } catch (error) {

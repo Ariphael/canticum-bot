@@ -7,9 +7,17 @@ import { AudioResourceState } from "./AudioResourceState";
 export { AudioResourceLoopQueueState };
 
 class AudioResourceLoopQueueState implements AudioResourceState {
-  private audioResource: AudioResource = undefined;
-  private currentPlayingMusicQueueItem: MusicQueueItemType = undefined;
-  private musicQueueIterator = getMusicQueueIterator();
+  private audioResource: AudioResource;
+  private currentPlayingMusicQueueItem: MusicQueueItemType;
+  private musicQueueIterator: IterableIterator<MusicQueueItemType>;
+  private resourceVolume: number;
+
+  constructor() {
+    this.audioResource = undefined;
+    this.currentPlayingMusicQueueItem = undefined;
+    this.musicQueueIterator = getMusicQueueIterator();
+    this.resourceVolume = 0.5;
+  }
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
     return this.doPlayAudio(audioPlayer);
@@ -35,8 +43,13 @@ class AudioResourceLoopQueueState implements AudioResourceState {
     if (volume < 0 || this.audioResource === null) {
       return false;
     }
+    this.resourceVolume = volume;
     this.audioResource.volume.setVolume(volume);
     return true;
+  }
+
+  public getResourceVolume(): number {
+    return this.resourceVolume;
   }
 
   private doPlayAudio(audioPlayer: AudioPlayer): boolean {
@@ -63,6 +76,8 @@ class AudioResourceLoopQueueState implements AudioResourceState {
     this.audioResource = createAudioResource(audioStream, {
       inlineVolume: true,
     });
+
+    this.audioResource.volume.setVolume(this.resourceVolume);
     
     try {
       audioPlayer.play(this.audioResource);
