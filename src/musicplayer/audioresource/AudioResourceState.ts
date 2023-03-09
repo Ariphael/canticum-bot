@@ -6,5 +6,6 @@ export interface AudioResourceState {
   getCurrentPlayingSongInfo(): MusicQueueItemType | undefined,
   setCurrentPlayingSong(musicQueueItem: MusicQueueItemType): MusicQueueItemType,
   setAudioPlayerStatusIdleListener(audioPlayer: AudioPlayer): AudioPlayer | undefined,
-  resourceSetVolume(volume: number): boolean
+  resourceSetVolume(volume: number): boolean,
+  getResourceVolume(): number
 }
