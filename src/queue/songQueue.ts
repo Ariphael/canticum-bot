@@ -14,16 +14,27 @@ export const dequeue = (): {musicTitle: String, musicId: String} | undefined => 
 }
 
 export const swapQueuePositions = (positionA: number, positionB: number): boolean => {
-  if (positionA < 0 || positionB < 0) {
+  if (positionA <= 0 || positionB <= 0) {
     return false;
-  } else if (musicQueue.at(positionA) === undefined || musicQueue.at(positionB) === undefined) {
+  } else if (musicQueue.at(positionA - 1) === undefined || musicQueue.at(positionB - 1) === undefined) {
     return false;
   }
 
-  const tempMusicQueueValue = musicQueue[positionA];
-  musicQueue[positionA] = musicQueue[positionB];
-  musicQueue[positionB] = tempMusicQueueValue;
+  const tempMusicQueueValue = musicQueue[positionA - 1];
+  musicQueue[positionA - 1] = musicQueue[positionB - 1];
+  musicQueue[positionB - 1] = tempMusicQueueValue;
   return true;
+}
+
+export const removeQueueItem = (queuePos: number): MusicQueueItemType | undefined => {
+  const deletedItemsArr = musicQueue.splice(queuePos - 1, 1);
+  return deletedItemsArr.length === 0 ? undefined : deletedItemsArr[0];
+};
+
+export const removeQueueItemsRange = (queuePosA: number, queuePosB: number): MusicQueueItemType[] | undefined => {
+  return queuePosA > queuePosB || queuePosA <= 0 || queuePosB <= 0 
+    ? undefined
+    : musicQueue.splice(queuePosA - 1, queuePosB - 1 - queuePosA + 2);
 }
 
 export const getMusicQueueIterator = () => {
@@ -31,7 +42,8 @@ export const getMusicQueueIterator = () => {
 }
 
 export const getMusicQueueItem = (index: number) => {
-  return musicQueue.at(index);
+  if (index <= 0) return undefined;
+  return musicQueue.at(index - 1);
 }
 
 export const getMusicQueueLength = (): number => {
