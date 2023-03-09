@@ -44,25 +44,34 @@ class AudioResourceManager {
 
   public switchToLoopCurrSongState(audioPlayer: AudioPlayer) {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
+    const currentAudioResourceVolume = this.audioResourceState.getResourceVolume();
     this.audioResourceLoopCurrSongState.setCurrentPlayingSong(currentPlayingSongInfo);
+    this.audioResourceLoopCurrSongState.resourceSetVolume(currentAudioResourceVolume);
     this.audioResourceState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceLoopCurrSongState;
+    audioPlayer.removeAllListeners();
     this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
   }
 
   public switchToLoopQueueState(audioPlayer: AudioPlayer) {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
+    const currentAudioResourceVolume = this.audioResourceState.getResourceVolume();
     this.audioResourceLoopQueueState.setCurrentPlayingSong(currentPlayingSongInfo);
+    this.audioResourceLoopCurrSongState.resourceSetVolume(currentAudioResourceVolume);
     this.audioResourceState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceLoopQueueState;
+    audioPlayer.removeAllListeners();
     this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
   }
 
   public switchToNormalState(audioPlayer: AudioPlayer) {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
+    const currentAudioResourceVolume = this.audioResourceState.getResourceVolume();
     this.audioResourceNormalState.setCurrentPlayingSong(currentPlayingSongInfo);
+    this.audioResourceLoopCurrSongState.resourceSetVolume(currentAudioResourceVolume);
     this.audioResourceState.setCurrentPlayingSong(null);
     this.audioResourceState = this.audioResourceNormalState;    
+    audioPlayer.removeAllListeners();
     this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
   }
 }
