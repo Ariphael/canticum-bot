@@ -1,6 +1,6 @@
 import { AudioResource, AudioPlayer, AudioPlayerStatus, createAudioResource } from "@discordjs/voice";
 import ytdl from "ytdl-core";
-import { getMusicQueueIterator, getMusicQueueLength } from "../../queue/songQueue";
+import { musicQueue } from "../../queue/musicQueue";
 import { MusicQueueItemType } from "../../types/musicQueueItem";
 import { AudioResourceState } from "./AudioResourceState";
 
@@ -15,7 +15,7 @@ class AudioResourceLoopQueueState implements AudioResourceState {
   constructor() {
     this.audioResource = undefined;
     this.currentPlayingMusicQueueItem = undefined;
-    this.musicQueueIterator = getMusicQueueIterator();
+    this.musicQueueIterator = musicQueue.getIterator();
     this.resourceVolume = 0.5;
   }
 
@@ -53,12 +53,12 @@ class AudioResourceLoopQueueState implements AudioResourceState {
   }
 
   private doPlayAudio(audioPlayer: AudioPlayer): boolean {
-    if (getMusicQueueLength() === 0) return false;
+    if (musicQueue.getLength() === 0) return false;
 
     if (this.currentPlayingMusicQueueItem === null) {
       let nextMusicQueueItem = this.musicQueueIterator.next();
       if (nextMusicQueueItem.done) {
-        this.musicQueueIterator = getMusicQueueIterator();
+        this.musicQueueIterator = musicQueue.getIterator();
         nextMusicQueueItem = this.musicQueueIterator.next();
       }
       this.currentPlayingMusicQueueItem = nextMusicQueueItem.value;

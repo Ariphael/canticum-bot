@@ -5,7 +5,7 @@ import {
   createAudioResource 
 } from "@discordjs/voice";
 import ytdl from "ytdl-core";
-import { dequeue } from "../../queue/songQueue";
+import { musicQueue } from "../../queue/musicQueue";
 import { MusicQueueItemType } from "../../types/musicQueueItem";
 import { AudioResourceState } from "./AudioResourceState";
 
@@ -56,7 +56,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
 
   private doPlayAudio(audioPlayer: AudioPlayer): boolean {
     const nextMusicQueueItem = this.currentPlayingMusicQueueItem === null
-      ? this.currentPlayingMusicQueueItem = dequeue()
+      ? this.currentPlayingMusicQueueItem = musicQueue.dequeue()
       : this.currentPlayingMusicQueueItem;
       
     this.audioResource = createAudioResource(
