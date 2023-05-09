@@ -27,7 +27,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
   };
 
   public resourceSetVolume(volume: number): boolean {
-    if (volume < 0 || this.audioResource === null) {
+    if (volume < 0 || this.audioResource === undefined) {
       return false;
     }
     this.resourceVolume = volume;
@@ -55,7 +55,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
   }
 
   private doPlayAudio(audioPlayer: AudioPlayer): boolean {
-    const nextMusicQueueItem = this.currentPlayingMusicQueueItem === null
+    const nextMusicQueueItem = this.currentPlayingMusicQueueItem === undefined
       ? this.currentPlayingMusicQueueItem = musicQueue.dequeue()
       : this.currentPlayingMusicQueueItem;
       
