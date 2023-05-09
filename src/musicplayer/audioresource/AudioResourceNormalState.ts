@@ -37,7 +37,7 @@ class AudioResourceNormalState implements AudioResourceState {
   public setAudioPlayerStatusIdleListener(audioPlayer: AudioPlayer): AudioPlayer | undefined {
     if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) >= 1) return undefined;
     return audioPlayer.on(AudioPlayerStatus.Idle, () => {
-      this.currentPlayingMusicQueueItem = null;
+      this.currentPlayingMusicQueueItem = undefined;
       if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
     });  
   }

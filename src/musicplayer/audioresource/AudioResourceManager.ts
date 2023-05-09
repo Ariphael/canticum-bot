@@ -30,7 +30,7 @@ class AudioResourceManager {
   }
 
   public clearCachedMusicQueueItem() {
-    this.audioResourceState.setCurrentPlayingSong(null);
+    this.audioResourceState.setCurrentPlayingSong(undefined);
   }
 
   public getCurrentPlayingSongInfo(): MusicQueueItemType {
@@ -43,35 +43,31 @@ class AudioResourceManager {
   }
 
   public switchToLoopCurrSongState(audioPlayer: AudioPlayer) {
-    const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
-    const currentAudioResourceVolume = this.audioResourceState.getResourceVolume();
-    this.audioResourceLoopCurrSongState.setCurrentPlayingSong(currentPlayingSongInfo);
-    this.audioResourceLoopCurrSongState.resourceSetVolume(currentAudioResourceVolume);
-    this.audioResourceState.setCurrentPlayingSong(undefined);
-    this.audioResourceState = this.audioResourceLoopCurrSongState;
-    audioPlayer.removeAllListeners();
-    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
+    this.transferCurrAudioResourceStateStateTo(this.audioResourceLoopCurrSongState);
+    this.setCurrAudioResourceStateTo(this.audioResourceLoopCurrSongState, audioPlayer);
   }
 
   public switchToLoopQueueState(audioPlayer: AudioPlayer) {
-    const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
-    const currentAudioResourceVolume = this.audioResourceState.getResourceVolume();
-    this.audioResourceLoopQueueState.setCurrentPlayingSong(currentPlayingSongInfo);
-    this.audioResourceLoopCurrSongState.resourceSetVolume(currentAudioResourceVolume);
-    this.audioResourceState.setCurrentPlayingSong(undefined);
-    this.audioResourceState = this.audioResourceLoopQueueState;
-    audioPlayer.removeAllListeners();
-    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
+    this.transferCurrAudioResourceStateStateTo(this.audioResourceLoopQueueState);
+    this.setCurrAudioResourceStateTo(this.audioResourceLoopQueueState, audioPlayer);
   }
 
   public switchToNormalState(audioPlayer: AudioPlayer) {
+    this.transferCurrAudioResourceStateStateTo(this.audioResourceNormalState);
+    this.setCurrAudioResourceStateTo(this.audioResourceNormalState, audioPlayer);
+  }
+
+  private transferCurrAudioResourceStateStateTo(to: AudioResourceState) {
     const currentPlayingSongInfo = this.audioResourceState.getCurrentPlayingSongInfo();
     const currentAudioResourceVolume = this.audioResourceState.getResourceVolume();
-    this.audioResourceNormalState.setCurrentPlayingSong(currentPlayingSongInfo);
-    this.audioResourceLoopCurrSongState.resourceSetVolume(currentAudioResourceVolume);
-    this.audioResourceState.setCurrentPlayingSong(null);
-    this.audioResourceState = this.audioResourceNormalState;    
+    to.setCurrentPlayingSong(currentPlayingSongInfo);
+    to.resourceSetVolume(currentAudioResourceVolume);   
+  }
+
+  private setCurrAudioResourceStateTo(to: AudioResourceState, audioPlayer: AudioPlayer) {
+    this.audioResourceState.setCurrentPlayingSong(undefined);
+    this.audioResourceState = to;  
     audioPlayer.removeAllListeners();
-    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
+    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);    
   }
 }

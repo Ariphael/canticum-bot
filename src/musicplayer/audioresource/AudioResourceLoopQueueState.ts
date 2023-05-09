@@ -34,13 +34,13 @@ class AudioResourceLoopQueueState implements AudioResourceState {
   public setAudioPlayerStatusIdleListener(audioPlayer: AudioPlayer): AudioPlayer | undefined {
     if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) >= 1) return undefined;
     return audioPlayer.on(AudioPlayerStatus.Idle, () => {
-      this.currentPlayingMusicQueueItem = null;
+      this.currentPlayingMusicQueueItem = undefined;
       if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
     });  
   }
 
   public resourceSetVolume(volume: number): boolean {
-    if (volume < 0 || this.audioResource === null) {
+    if (volume < 0 || this.audioResource === undefined) {
       return false;
     }
     this.resourceVolume = volume;
@@ -55,7 +55,7 @@ class AudioResourceLoopQueueState implements AudioResourceState {
   private doPlayAudio(audioPlayer: AudioPlayer): boolean {
     if (musicQueue.getLength() === 0) return false;
 
-    if (this.currentPlayingMusicQueueItem === null) {
+    if (this.currentPlayingMusicQueueItem === undefined) {
       let nextMusicQueueItem = this.musicQueueIterator.next();
       if (nextMusicQueueItem.done) {
         this.musicQueueIterator = musicQueue.getIterator();
