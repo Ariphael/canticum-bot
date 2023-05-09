@@ -1,7 +1,5 @@
 import { Command } from '../interfaces/command-interface';
-import { apikey } from '../config.json';
-import axios from 'axios';
-import { addSongRequest, getMusicQueueItem } from '../queue/songQueue';
+import { musicQueue } from '../queue/musicQueue';
 import { 
   ApplicationCommandOptionType,
   CacheType, 
@@ -11,18 +9,28 @@ import {
 } from 'discord.js';
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
 import { getVoiceConnection } from '@discordjs/voice';
-import ytdl from 'ytdl-core';
+import { 
+  enqueueSpotifyMusicInfoFromURL, 
+  enqueueYouTubeMusicInfoFromURL, 
+  getAndEnqueueYouTubeVideoInfoFromNonURLQueryAndUpdateEmbed 
+} from './utils/enqueue';
 
-const ytLinkRegExp = 
-  /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
+const youtubeURLRegExp = 
+  /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+const spotifyURLRegExp = 
+  /^(?:spotify:|(?:https?:\/\/(?:open|play)\.spotify\.com\/))(?:embed)?\/?(playlist|track)(?::|\/)((?:[0-9a-zA-Z]){22})/;
+
+const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
+
+const executePlaySpotifyURLErrorStr = 'Invalid Spotify track URL/id or empty/non-public/non-existent playlist. Please verify that the query is correct.';
 
 export const play: Command = {
   name: 'play',
-  description: 'plays song or adds song to queue',
+  description: 'plays or enqueues song',
   options: [{
     type: ApplicationCommandOptionType.String,
     name: 'query',
-    description: 'music name', 
+    description: 'youtube or spotify link or query',
     required: true,
   }],
   run: async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
@@ -31,45 +39,96 @@ export const play: Command = {
 };
 
 const executePlay = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  const embed = new EmbedBuilder().setColor(0x0099FF);
-
+  const embed = new EmbedBuilder();
+  const query = interaction.options.getString('query');
   const voiceConnection = getVoiceConnection(interaction.guild.id);
+
   if (voiceConnection === undefined) {
-    embed.setDescription('Must be connected to voice channel first!');
+    embed.setTitle('Error')
+      .setDescription('Must be connected to voice channel first!');
     await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
     return;
-  }
+  } 
 
-  const query = interaction.options.getString('query');
-  const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
+  // This is a command that might take longer than 3 seconds to respond. For instance, 
+  // a substantial amount of time may be consumed by fetching items in a long playlist.
+  await interaction.deferReply();
 
-  const newQueueLength = ytLinkRegExp.test(query)
-  ? await ytdl.getInfo(query)
-      .then(({ videoDetails: { title, videoId } }) => addSongRequest(title, videoId))
-      .catch(() => -1)
-  : await axios({
-      method: 'get',
-      url: `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${query}&key=${apikey}`
-    })
-      .then(({ data: { items } }) => items.length ? addSongRequest(items[0].snippet.title, items[0].id.videoId) : -1);
-  
-  if (newQueueLength === -1) {
-    embed.setTitle('Error')
-      .setDescription('Cannot find song!');
+  if (youtubeURLRegExp.test(query)) {
+    await executePlayYouTubeURL(_client, interaction, embed);
+  } else if (spotifyURLRegExp.test(query)) {
+    await executePlaySpotifyURL(_client, interaction, embed);
   } else {
-    const musicQueueItem = getMusicQueueItem(-1);
-    const musicPlayerAvailabilityStatus = 
-      !musicPlayerInstance.isPlayingAudio() && newQueueLength === 1;
-
-    embed.setTitle(musicPlayerAvailabilityStatus ? 'Now Playing' : 'Added to Queue')
-      .setDescription(musicQueueItem.musicTitle.toString())
-      .setURL(`https://www.youtube.com/watch?v=${musicQueueItem.musicId}`)
-      .setTimestamp();
-  
-    if (musicPlayerAvailabilityStatus) {
-      musicPlayerInstance.playAudio();
-    }
+    await executePlayYouTubeQuery(_client, interaction, embed);
   }
-      
-  await interaction.reply({ content: '', components: [], embeds: [embed] });
 };
+
+const executePlayYouTubeURL = async (
+  _client: Client, 
+  interaction: ChatInputCommandInteraction<CacheType>, 
+  embed: EmbedBuilder
+) => {
+  const query = interaction.options.getString('query');
+  const musicQueueOldLength = musicQueue.getLength();
+
+  await enqueueYouTubeMusicInfoFromURL(query, embed);
+
+  if (musicQueueOldLength === 0 && !musicPlayerInstance.isPlayingAudio()) {
+    musicPlayerInstance.playAudio();
+  }
+
+  await interaction.editReply({ 
+    content: '', 
+    components: [], 
+    embeds: [embed],
+  });
+}
+
+const executePlaySpotifyURL = async (
+  _client: Client, 
+  interaction: ChatInputCommandInteraction<CacheType>, 
+  embed: EmbedBuilder
+) => {
+  const query = interaction.options.getString('query');
+  const musicQueueOldLength = musicQueue.getLength();
+
+  const musicQueueNewLength = await enqueueSpotifyMusicInfoFromURL(query, embed);
+  // if (musicQueueOldLength === musicQueueNewLength) {
+  //   return sendErrorMessageToChannel(
+  //     executePlaySpotifyURLErrorStr,
+  //     interaction,
+  //     embed
+  //   );
+  // }
+
+  if (musicQueueOldLength === 0 && !musicPlayerInstance.isPlayingAudio()) {
+    musicPlayerInstance.playAudio();
+  }
+
+  await interaction.editReply({ 
+    content: '', 
+    components: [], 
+    embeds: [embed],
+  });
+}
+
+const executePlayYouTubeQuery = async (  
+  _client: Client, 
+  interaction: ChatInputCommandInteraction<CacheType>, 
+  embed: EmbedBuilder
+) => {
+  const query = interaction.options.getString('query');
+  const musicQueueOldLength = musicQueue.getLength();
+
+  await getAndEnqueueYouTubeVideoInfoFromNonURLQueryAndUpdateEmbed(query, embed);
+
+  if (musicQueueOldLength === 0 && !musicPlayerInstance.isPlayingAudio()) {
+    musicPlayerInstance.playAudio();
+  }
+
+  await interaction.editReply({ 
+    content: '', 
+    components: [], 
+    embeds: [embed],
+  });
+}
