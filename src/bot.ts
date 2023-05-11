@@ -9,7 +9,7 @@ import axios from 'axios';
 
 dotenv.config();
 
-var refresh_token;
+var refresh_token: string;
 
 const client = new Client({
   intents: [
@@ -45,46 +45,7 @@ const getCommands = async (): Promise<Collection<string, Command>> => {
   return commandCollection;
 };
 
-const scheduleHourlySpotifyAccessTokenRenewal = () => {
-  const currentMinutes = new Date().getMinutes();
-  cron.schedule(`${currentMinutes} * * * *`, () => {
-    console.log("refreshing spotify access token...");
-    const bodyParams = {
-      grant_type: 'refresh_token',
-      refresh_token: refresh_token,
-      client_id: process.env.SPOTIFY_API_ID
-    }
-    const spotifyAccessTokenRenewalRequestResponse = 
-      axios.post('https://accounts.spotify.com/api/token', 
-        bodyParams, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }
-      )
-        .then(response => storeSpotifyAccessToken(response.data.access_token));
-    
-  });
-}
 
-const acquireSpotifyAccessToken = async (): Promise<string> => {
-  const spotifyAccessTokenRequestResponse =
-    await axios.post(
-      `https://accounts.spotify.com/api/token?grant_type=authorization_code&code=${process.env.SPOTIFY_AUTH_CODE}&redirect_uri=${process.env.SPOTIFY_REDIRECT_URI}&client_id=${process.env.SPOTIFY_API_ID}&code_verifier=${process.env.CODE_VERIFIER}`
-    );
 
-  refresh_token = spotifyAccessTokenRequestResponse.data.refresh_token;
-  return spotifyAccessTokenRequestResponse.data.access_token;
-}
-
-const storeSpotifyAccessToken = (access_token: string) => {
-  const accessTokenJsonString = JSON.stringify({
-    spotifyAccessToken: access_token
-  });
-
-  fs.writeFile('../config/config.json', accessTokenJsonString, 'utf8', (err) => {
-    if (err) throw err;
-  });
-}
 
 startCanticum(client);
