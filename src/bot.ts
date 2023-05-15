@@ -6,10 +6,9 @@ import { addReadyEventToClient } from './events/ready';
 import { addInteractionCreateEventToClient } from './events/interactionCreate';
 import { Command } from './interfaces/command-interface';
 import axios from 'axios';
+import { refreshSpotifyAccessToken, scheduleHourlySpotifyAccessTokenRenewal } from './utils/spotify';
 
 dotenv.config();
-
-var refresh_token: string;
 
 const client = new Client({
   intents: [
@@ -21,9 +20,10 @@ const client = new Client({
 export const startCanticum = async (client: Client<boolean>) => {
   console.log('Bot is starting...');
 
-  const spotify_access_token = await acquireSpotifyAccessToken();
-  storeSpotifyAccessToken(spotify_access_token);
+  console.log('Refreshing spotify access token...')
+  await refreshSpotifyAccessToken();
   scheduleHourlySpotifyAccessTokenRenewal();
+
   const commandCollection = await getCommands();
   addReadyEventToClient(client, commandCollection);
   addInteractionCreateEventToClient(client, commandCollection);
@@ -44,8 +44,5 @@ const getCommands = async (): Promise<Collection<string, Command>> => {
 
   return commandCollection;
 };
-
-
-
 
 startCanticum(client);
