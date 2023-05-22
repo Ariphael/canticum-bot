@@ -1,8 +1,5 @@
 import * as cron from 'node-cron';
-import * as path from 'path';
 import axios from "axios";
-import fs from 'fs';
-import puppeteer from 'puppeteer';
 import { input } from '@inquirer/prompts';
 import { createHash } from 'node:crypto';
 
@@ -10,23 +7,31 @@ export const refreshSpotifyAccessToken = async () => {
   const bodyParams = {
     grant_type: 'refresh_token',
     refresh_token: process.env['SPOTIFY_REFRESH_TOKEN'],
-    client_id: process.env['SPOTIFY_API_ID']
-  }
+  };
+
+  const base64Auth = 
+    Buffer
+      .from(`${process.env['SPOTIFY_API_ID']}:${process.env['SPOTIFY_CLIENT_SECRET']}`)
+      .toString('base64');
 
   const configParams = {
     headers: {
+      'Authorization': `Basic ${base64Auth}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     }
-  }
+  };
 
   await axios
     .post('https://accounts.spotify.com/api/token', bodyParams, configParams)
-    .then(
-      response => storeSpotifyAccessToken(response.data.access_token)
-    )
+    .then(response => {
+        process.env['SPOTIFY_ACCESS_TOKEN'] = response.data.access_token;
+    })
     .catch(async (error) => {
-      if (error.response !== undefined && error.response.data.error === 'invalid_grant') {
-        await refreshTokenRevocationExceptionHandler();
+      if (error.response !== undefined) {
+        console.log('An error occurred while refreshing the spotify access token');
+        console.log(`${error.response.data.error}: ${error.response.data.error_description}`);
+        if (error.response.data.error === 'invalid_grant')
+          await refreshTokenRevocationExceptionHandler();
       } else if (error.request) {
         console.log('Network error. Attempting to refresh spotify access token again...');
         refreshSpotifyAccessToken();
@@ -54,7 +59,9 @@ export const scheduleHourlySpotifyAccessTokenRenewal = () => {
 
     await axios
       .post('https://accounts.spotify.com/api/token', bodyParams, configParams)
-      .then(response => storeSpotifyAccessToken(response.data.access_token))
+      .then(response => {
+        process.env['SPOTIFY_ACCESS_TOKEN'] = response.data.access_token;
+      })
       .catch(async (error) => {
         if (error.response && error.response.data.error === 'invalid_grant') {
           await refreshTokenRevocationExceptionHandler();
@@ -65,15 +72,13 @@ export const scheduleHourlySpotifyAccessTokenRenewal = () => {
 }
  
 export const refreshTokenRevocationExceptionHandler = async () => {
-  console.log('refreshTokenRevocationExceptionHandler called...');
+  console.log('Refresh token revoked exception');
 
-  const codeChallenge = generateCodeChallenge(process.env['SPOTIFY_CODE_VERIFIER']);
+  // const codeChallenge = generateCodeChallenge(process.env['SPOTIFY_CODE_VERIFIER']);
   const userAuthorizationRequestQueryParameters = new URLSearchParams({
     client_id: process.env['SPOTIFY_API_ID'],
     response_type: 'code',
     redirect_uri: process.env['SPOTIFY_REDIRECT_URI'],
-    code_challenge_method: 'S256',
-    code_challenge: codeChallenge,
   });
   const requestURL = 
     `https://accounts.spotify.com/authorize?${userAuthorizationRequestQueryParameters.toString()}`;
@@ -81,13 +86,16 @@ export const refreshTokenRevocationExceptionHandler = async () => {
   console.log('Instructions: ');
   console.log(`Please open a browser and go to the URL: ${requestURL}`);
   console.log(
-    'Press the accept button, then copy the code parameter in the redirect URI to clipboard'
+    'Press the accept button if required, then copy the value of the code parameter in the redirect uri below'
   );
 
   const responseAuthCode = await input({
     message: 'Enter authorization code',
   });
   requestAccessToken(responseAuthCode);
+  console.log(
+    'Copy the refresh token to the .env file to avoid the refresh token revocation procedure repeating on restart.'
+  );
 }
 
 const requestAccessToken = (authCode: string) => {
@@ -99,12 +107,16 @@ const doRequestAccessToken = (authCode: String, attempt: number) => {
     grant_type: 'authorization_code',
     code: authCode,
     redirect_uri: process.env['SPOTIFY_REDIRECT_URI'],
-    client_id: process.env['SPOTIFY_API_ID'],
-    code_verifier: process.env['SPOTIFY_CODE_VERIFIER']
   };
+
+  const base64Auth = 
+    Buffer
+      .from(`${process.env['SPOTIFY_API_ID']}:${process.env['SPOTIFY_CLIENT_SECRET']}`)
+      .toString('base64');
 
   const configParams = {
     headers: {
+      'Authorization': `Basic ${base64Auth}`,
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   };
@@ -113,7 +125,8 @@ const doRequestAccessToken = (authCode: String, attempt: number) => {
     .post('https://accounts.spotify.com/api/token', bodyParams, configParams)
     .then((response) => {
       process.env['SPOTIFY_REFRESH_TOKEN'] = response.data.refresh_token;
-      storeSpotifyAccessToken(response.data.access_token);
+      process.env['SPOTIFY_ACCESS_TOKEN'] = response.data.access_token;
+      console.log(`refresh_token=${response.data.refresh_token}`);
       console.log('Spotify API refresh and access token updated :)');
     })
     .catch((error) => {
@@ -146,19 +159,4 @@ const generateCodeChallenge = (codeVerifier: string) => {
     .replace(/=+$/, '');
 
   return digest;
-}
-
-const storeSpotifyAccessToken = (access_token: string) => {
-  const accessTokenJsonString = JSON.stringify({
-    spotifyAccessToken: access_token
-  });
-
-  fs.writeFile(
-    path.join(__dirname, '../../config/spotify.json'), 
-    accessTokenJsonString, 
-    'utf8', 
-    (err) => {
-      if (err) throw err;
-    }
-  );
 }
