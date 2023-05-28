@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { EmbedBuilder } from 'discord.js';
 import { musicQueue } from '../../queue/musicQueue';
 import { spotifyAccessToken } from '../../../config/spotify.json';
-import { enqueueSpotifyPlaylistRequest, enqueueSpotifyTrackRequest } from './play/spotify';
+import { enqueueSpotifyAlbumRequest, enqueueSpotifyPlaylistRequest, enqueueSpotifyTrackRequest } from './play/spotify';
 import { enqueueYouTubePlaylistRequest, enqueueYouTubeSongRequest } from './play/youtube';
 
 /*
@@ -29,11 +29,14 @@ export const enqueueMusicSpotify = async (url: string): Promise<EmbedBuilder> =>
   
   const includesPlaylistId = url.includes('playlist/');
   const includesTrackId = url.includes('track/');
+  const includesAlbumId = url.includes('album/');
 
   if (includesPlaylistId) {
     return await enqueueSpotifyPlaylistRequest(url);
   } else if (includesTrackId) {
     return await enqueueSpotifyTrackRequest(url);
+  } else if (includesAlbumId) {
+    return await enqueueSpotifyAlbumRequest(url);
   }
 }
 
