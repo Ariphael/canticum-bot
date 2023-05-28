@@ -14,38 +14,31 @@ const invalidSpotifyTrackIdErrorStr = 'Invalid track ID. Please check that the U
 const emptySpotifyPlaylistErrorStr = 'Empty spotify playlist..?';
 const unexpectedErrorStr = 'An unexpected error occurred.';
 
-export const enqueueMusicYouTube = async (
-  url: string, 
-  embed: EmbedBuilder
-) => {
+export const enqueueMusicYouTube = async (url: string): Promise<EmbedBuilder> => {
   const includesPlaylistId = url.includes('list=');
 
   if (includesPlaylistId) {
-    enqueueYouTubePlaylistRequest(url, embed);
+    // do this for enqueueyoutubesongrequest
+    return await enqueueYouTubePlaylistRequest(url);
   } else {
-    enqueueYouTubeSongRequest(url, embed);
+    return await enqueueYouTubeSongRequest(url);
   }
 }
 
-export const enqueueMusicSpotify = async (
-  url: string, 
-  embed: EmbedBuilder
-) => {
+export const enqueueMusicSpotify = async (url: string): Promise<EmbedBuilder> => {
   
   const includesPlaylistId = url.includes('playlist/');
   const includesTrackId = url.includes('track/');
 
   if (includesPlaylistId) {
-    await enqueueSpotifyPlaylistRequest(url, embed);
+    return await enqueueSpotifyPlaylistRequest(url);
   } else if (includesTrackId) {
-    await enqueueSpotifyTrackRequest(url, embed);
+    return await enqueueSpotifyTrackRequest(url);
   }
 }
 
-export const enqueueMusicYouTubeNonURLQuery = async (
-  query: string, 
-  embed: EmbedBuilder
-) => {
+export const enqueueMusicYouTubeNonURLQuery = async (query: string): Promise<EmbedBuilder> => {
+  const embed = new EmbedBuilder();
   try {
     const videoInfo = await axios
       .get(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${query}&key=${process.env.YOUTUBE_API_KEY}`)
@@ -60,7 +53,7 @@ export const enqueueMusicYouTubeNonURLQuery = async (
     
     const newQueueLength = musicQueue.enqueue(videoInfo);
 
-    embed.setTitle(newQueueLength > 1 ? 'Added to Queue' : 'Now Playing')
+    return embed.setTitle(newQueueLength > 1 ? 'Added to Queue' : 'Now Playing')
       .setDescription(videoInfo.musicTitle)
       .setURL(`https://www.youtube.com/watch?v=${videoInfo.musicId}`)
       .setTimestamp(); 
