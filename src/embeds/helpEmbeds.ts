@@ -10,12 +10,12 @@ export const embeds: EmbedBuilder[] = [
     .setDescription('List of essential commands. Usage: /help [command]')
     .addFields(
       { name: 'help (command)', value: 'Displays this page/information about specific command', inline: true },
-      { name: 'connect', value: 'Connects to target voice channel', inline: true },
-      { name: 'disconnect', value: 'Disconnects from target voice channel', inline: true}, 
-      { name: 'addqueue [link]', value: 'Adds song to queue', inline: true }, 
-      { name: 'rmqueue [link/id]', value: 'Removes song from queue', inline: true },
+      { name: 'ping', value: 'Displays bot and API latency in ms', inline: true} ,
+      { name: 'connect [target]', value: 'Connects to target voice channel', inline: true },
+      { name: 'disconnect', value: 'Disconnects from voice channel', inline: true}, 
       { name: 'queue', value: 'Displays the queue', inline: true }, 
-      { name: 'toggleplay', value: 'Plays/pauses music', inline: true },
+      { name: 'play [link/query]', value: 'Plays/adds music to queue. Searches on youtube.', inline: true },
+      { name: 'clear', value: 'clears queue', inline: true },
     )
     .setTimestamp()
     .setFooter({ text: `page 1/${numPages}`}), 
@@ -35,7 +35,7 @@ export const getCommandEmbed = (command: String): EmbedBuilder => {
       .setColor(0x0099FF)
       .setTitle('Help')
       .setAuthor({ name: 'Canticum' })
-      .setDescription('Unknown command. Please type /help to see list of valid commands.')
+      .setDescription('Unknown command. Please use /help to see list of valid commands.')
       .setTimestamp()
       .setFooter({ text: `page 1/1`})  
   }

@@ -1,64 +1,80 @@
-import { CacheType, ChatInputCommandInteraction } from "discord.js";
-import { executeDisconnect } from "../commands/disconnect";
-import { getClientMock } from "../mocks/mocks";
+import * as discordJsVoice from '@discordjs/voice';
+import { disconnect } from "../commands/disconnect";
+import { getChatInputCommandInteractionMock, getClientMock } from "../mocks/mocks";
 
+const discordJsVoiceConnectionMock = ({
+  subscribe: jest.fn(),
+  joinConfig: {
+    channelId: String,
+  },
+  destroy: jest.fn(),
+  on: jest.fn(),
+} as unknown) as discordJsVoice.VoiceConnection;
+
+jest.mock('@discordjs/voice', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('@discordjs/voice'),
+    joinVoiceChannel: jest.fn(),
+    getVoiceConnection: jest.fn(),
+  };
+});
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('disconnect command', () => {
   const client = getClientMock();
-  const interaction = ({
-    guild: {
-      id: String,
-    },
-    reply: jest.fn(),
-  } as unknown) as ChatInputCommandInteraction<CacheType>;
+  const interaction = getChatInputCommandInteractionMock();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  })
+  test('destroys voice connection if connection exists', async () => {
+    jest.spyOn(discordJsVoice, 'getVoiceConnection').mockImplementationOnce(() => {
+      return discordJsVoiceConnectionMock;
+    });
+    const voiceConnectionDestroySpy = jest.spyOn(discordJsVoiceConnectionMock, 'destroy');
+    await disconnect.run(client, interaction);
+    expect(voiceConnectionDestroySpy).toHaveBeenCalledTimes(1);
+    expect(voiceConnectionDestroySpy).toHaveBeenCalledWith();
+  });
 
-  test('calls interaction.reply with ephemeral flag enabled if there does not exist a voice channel connection (executeDisconnect called directly)', async () => {
-    expect.assertions(4);
-    await executeDisconnect(client, interaction, -1); 
-    expect(interaction.reply).toHaveBeenCalledTimes(1);
-    expect(interaction.reply).not.toHaveBeenCalledWith({
-      content: expect.any(String), 
-      components: expect.any(Object), 
-      embeds: expect.any(Object), 
-      ephemeral: false,      
+  test('does not attempt to destroy a non-existant voice connection', async () => {
+    jest.spyOn(discordJsVoice, 'getVoiceConnection').mockImplementationOnce(() => {
+      return null;
+    });   
+    const voiceConnectionDestroySpy = jest.spyOn(discordJsVoiceConnectionMock, 'destroy');
+    await disconnect.run(client, interaction);
+    expect(voiceConnectionDestroySpy).not.toHaveBeenCalled();  
+  });
+
+  test('sends a message to channel (connection exists)', async () => {
+    jest.spyOn(discordJsVoice, 'getVoiceConnection').mockImplementationOnce(() => {
+      return discordJsVoiceConnectionMock;
     });
-    expect(interaction.reply).not.toHaveBeenCalledWith({
-      content: expect.any(String), 
-      components: expect.any(Object), 
-      embeds: expect.any(Object),       
-    });
+    await disconnect.run(client, interaction);
+    expect(interaction.reply).toHaveBeenCalledTimes(1);    
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: expect.any(String), 
-      components: expect.any(Object), 
-      embeds: expect.any(Object), 
-      ephemeral: true,
+      content: '', 
+      components: [], 
+      embeds: expect.any(Object),
     });
   });
 
-  test('calls interaction.reply with ephemeral flag set to default value (false) if there exists avoice channel connection (executeDisconnect called directly)', async () => {
-    expect.assertions(4);
-    await executeDisconnect(client, interaction, 1);
-    expect(interaction.reply).toHaveBeenCalledTimes(1);
-    expect(interaction.reply).not.toHaveBeenCalledWith({
-      content: expect.any(String), 
-      components: expect.any(Object), 
-      embeds: expect.any(Object), 
-      ephemeral: true,
-    });  
-    expect(interaction.reply).not.toHaveBeenCalledWith({
-      content: expect.any(String), 
-      components: expect.any(Object), 
-      embeds: expect.any(Object), 
-      ephemeral: false,
-    });  
+  test('sends a message to channel with ephemeral flag set to true (connection does not exist)', async () => {
+    jest.spyOn(discordJsVoice, 'getVoiceConnection').mockImplementationOnce(() => {
+      return null;
+    });
+    await disconnect.run(client, interaction);
+    expect(interaction.reply).toHaveBeenCalledTimes(1);    
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: expect.any(String), 
-      components: expect.any(Object), 
-      embeds: expect.any(Object), 
+      content: '', 
+      components: [], 
+      embeds: expect.any(Object),
+      ephemeral: true,
     });    
-  })
+  });
 });

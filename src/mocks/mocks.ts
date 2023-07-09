@@ -1,9 +1,11 @@
 import { prevButtonId, nextButtonId } from '../buttons/buttonIdData.json';
-import { Button } from '../buttons/button-interface';
+import { Button } from '../interfaces/button-interface';
 import { 
   ButtonInteraction, 
   CacheType, 
+  ChatInputCommandInteraction, 
   Client, 
+  ComponentType, 
   GuildTextBasedChannel, 
   InteractionCollector, 
   InteractionResponse, 
@@ -11,7 +13,8 @@ import {
   MessageComponentInteraction, 
   SelectMenuInteraction 
 } from "discord.js";
-import { Command } from '../commands/command-interface';
+import { Command } from '../interfaces/command-interface';
+import { VoiceConnection } from '@discordjs/voice';
 
 type interactionCollectorType = 
   InteractionCollector<SelectMenuInteraction<CacheType> | ButtonInteraction<CacheType>>;
@@ -68,15 +71,6 @@ export const getGuildTextBasedChannelMock = (interactionCollector: interactionCo
     }), 
   } as unknown) as GuildTextBasedChannel);
 
-export const getInteractionNotChatInputCommandMock = () => 
-  (({
-    reply: jest.fn(),
-    commandName: String,
-    isChatInputCommand: jest.fn(() => {
-      return false;
-    })
-  } as unknown) as ButtonInteraction<CacheType>);
-
 export const getSlashCommandMock = () => 
   (({
     name: String, 
@@ -88,3 +82,27 @@ export const getMessageComponentInteractionMock = () =>
   (({
     update: jest.fn(),
   } as unknown) as MessageComponentInteraction<CacheType>);
+
+export const getChatInputCommandInteractionMock = () => 
+  (({
+    guild: {
+      id: String,
+      voiceAdapterCreator: jest.fn()
+    },
+    editReply: jest.fn(), 
+    options: {
+      getChannel: jest.fn((name: string) => {
+        return {
+          id: String,
+        }
+      }),
+    },
+    reply: jest.fn(),
+  } as unknown) as ChatInputCommandInteraction<CacheType>);
+
+export const getMessageComponentInteractionWithCustomIdMock = (customId: string) => 
+  (({
+    componentType: ComponentType.Button,
+    customId: customId,
+    update: jest.fn(),
+  } as unknown) as ButtonInteraction<CacheType>);
