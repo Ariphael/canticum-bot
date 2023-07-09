@@ -6,7 +6,7 @@ import {
   EmbedBuilder
 } from "discord.js";
 import { Command } from "../interfaces/command-interface";
-import { getMusicQueueItem, swapQueuePositions } from "../queue/songQueue";
+import { musicQueue } from "../queue/musicQueue";
 
 export const swap: Command = {
   name: 'swap',
@@ -31,7 +31,7 @@ const executeSwap = async (_client: Client, interaction: ChatInputCommandInterac
   const embed = new EmbedBuilder();
   const positionA = interaction.options.getInteger('pos1');
   const positionB = interaction.options.getInteger('pos2');
-  if (getMusicQueueItem(positionA) === undefined || getMusicQueueItem(positionB) === undefined) {
+  if (musicQueue.getItem(positionA) === undefined || musicQueue.getItem(positionB) === undefined) {
     embed.setTitle('Error')
       .setDescription('positionA and positionB must refer to valid positions in the queue. See queue using /queue');
     await interaction.reply({
@@ -43,7 +43,7 @@ const executeSwap = async (_client: Client, interaction: ChatInputCommandInterac
     return;
   } 
 
-  swapQueuePositions(positionA, positionB);
+  musicQueue.swapQueuePositions(positionA, positionB);
   embed.setTitle('Swap')
     .setDescription(`Swapped position ${positionA} and ${positionB} of the queue. See queue using /queue`);
   await interaction.reply({

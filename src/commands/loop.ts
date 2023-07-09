@@ -8,7 +8,6 @@ import {
 } from "discord.js";
 import { Command } from "../interfaces/command-interface";
 import { MusicPlayer } from "../musicplayer/MusicPlayer";
-import { addSongRequest } from "../queue/songQueue";
 
 const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
 
@@ -22,7 +21,7 @@ export const loop: Command = {
     }, {
       type: ApplicationCommandOptionType.Subcommand,
       name: 'queue',
-      description: 'loop the queue (no dequeue operations)',
+      description: 'loop the queue (can use /skip without dequeue operation occurring)',
       options: [{
         type: ApplicationCommandOptionType.Boolean,
         name: 'append',
@@ -76,11 +75,6 @@ const executeLoopCurrSong = async (interaction: ChatInputCommandInteraction<Cach
 };
 
 const executeLoopQueue = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
-  if (interaction.options.getBoolean('append')) {
-    const currentlyPlayingSong = musicPlayerInstance.getCurrentPlayingSongInfo();
-    addSongRequest(currentlyPlayingSong.musicTitle, currentlyPlayingSong.musicId);
-  }
-
   musicPlayerInstance.switchToLoopQueueState();
   embed.setTitle('Loop')
     .setDescription(`Looping queue`);

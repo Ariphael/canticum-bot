@@ -21,8 +21,8 @@ class AudioResourceManager {
   }
 
   public playAudio(audioPlayer: AudioPlayer): boolean {
-    return this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer) 
-      && this.audioResourceState.playAudio(audioPlayer);
+    this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
+    return this.audioResourceState.playAudio(audioPlayer);
   }
 
   public resourceSetVolume(volume: number): boolean {

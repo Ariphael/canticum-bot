@@ -68,9 +68,9 @@ class AudioResourceNormalState implements AudioResourceState {
           liveBuffer: 1 << 62,
           dlChunkSize: 0,
           quality: "lowestaudio",
-         }), {
+        }), {
           inlineVolume: true,
-         }
+        }
       );
       this.audioResource.volume.setVolume(this.resourceVolume);
       audioPlayer.play(this.audioResource);

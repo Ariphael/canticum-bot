@@ -1,5 +1,4 @@
 import * as discordJsVoice from '@discordjs/voice';
-import { connect } from "../commands/connect";
 import { disconnect } from "../commands/disconnect";
 import { getChatInputCommandInteractionMock, getClientMock } from "../mocks/mocks";
 

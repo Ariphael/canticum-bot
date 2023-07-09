@@ -4,7 +4,7 @@ import { play } from '../commands/play';
 import { getClientMock } from '../mocks/mocks';
 import { getChatInputCommandInteractionMock } from '../mocks/play.test.mocks';
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
-import { addSongRequest, clearQueue } from '../queue/songQueue';
+import { addSongRequest, clearQueue } from '../queue/musicQueue';
 
 const client = getClientMock();
 const interaction = getChatInputCommandInteractionMock();

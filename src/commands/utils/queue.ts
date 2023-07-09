@@ -2,17 +2,18 @@ import axios, { AxiosResponse } from 'axios';
 import { EmbedBuilder } from 'discord.js';
 import { musicQueue } from '../../queue/musicQueue';
 import { spotifyAccessToken } from '../../../config/spotify.json';
-import { enqueueSpotifyAlbumRequest, enqueueSpotifyPlaylistRequest, enqueueSpotifyTrackRequest } from './play/spotify';
+import { 
+  enqueueSpotifyAlbumRequest, 
+  enqueueSpotifyPlaylistRequest, 
+  enqueueSpotifyTrackRequest 
+} from './play/spotify';
 import { enqueueYouTubePlaylistRequest, enqueueYouTubeSongRequest } from './play/youtube';
 
 /*
- * Contains auxiliary functions involved with interacting with the queue
+ * Contains auxiliary functions involved with fetching and enqueuing music from YouTube/Spotify
  */
 
 const failedYouTubeMusicQueryErrorStr = 'No song found associated with query';
-const invalidSpotifyTrackIdErrorStr = 'Invalid track ID. Please check that the URL passed in the query is correct and try again.';
-const emptySpotifyPlaylistErrorStr = 'Empty spotify playlist..?';
-const unexpectedErrorStr = 'An unexpected error occurred.';
 
 export const enqueueMusicYouTube = async (url: string): Promise<EmbedBuilder> => {
   const includesPlaylistId = url.includes('list=');
@@ -26,7 +27,6 @@ export const enqueueMusicYouTube = async (url: string): Promise<EmbedBuilder> =>
 }
 
 export const enqueueMusicSpotify = async (url: string): Promise<EmbedBuilder> => {
-  
   const includesPlaylistId = url.includes('playlist/');
   const includesTrackId = url.includes('track/');
   const includesAlbumId = url.includes('album/');

@@ -24,6 +24,7 @@ const executePause = async (_client: Client, interaction: ChatInputCommandIntera
       content: '',
       components: [],
       embeds: [embed],
+      ephemeral: true,
     });
   } else if (!musicPlayerInstance.isPlayingAudio()) {
     embed.setTitle('Error')
@@ -33,6 +34,7 @@ const executePause = async (_client: Client, interaction: ChatInputCommandIntera
       content: '',
       components: [],
       embeds: [embed],
+      ephemeral: true,
     });
   } else {
     musicPlayerInstance.pauseAudio();

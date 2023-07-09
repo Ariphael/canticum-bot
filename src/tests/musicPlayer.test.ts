@@ -1,7 +1,7 @@
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
 import { AudioResourceNormalState } from '../musicplayer/AudioResourceNormalState';
 import { AudioPlayer, AudioResource, createAudioPlayer, NoSubscriberBehavior, PlayerSubscription, VoiceConnection } from '@discordjs/voice';
-import { addSongRequest, clearQueue } from '../queue/songQueue';
+import { addSongRequest, clearQueue } from '../queue/musicQueue';
 import ytdl from 'ytdl-core';
 
 jest.mock('@discordjs/voice', () => {

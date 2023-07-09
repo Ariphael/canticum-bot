@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, Client, ChatInputCommandInteraction, CacheType, EmbedBuilder } from "discord.js";
 import { Command } from "../interfaces/command-interface";
-import { getMusicQueueLength, removeQueueItem, removeQueueItemsRange } from "../queue/songQueue";
+import { musicQueue } from "../queue/musicQueue";
 
 export const remove: Command = {
   name: 'remove',
@@ -49,7 +49,7 @@ const executeRemove = async (client: Client, interaction: ChatInputCommandIntera
 const executeRemoveItem = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const embed = new EmbedBuilder();
   const positionOption = interaction.options.getInteger('position');
-  if (positionOption < 1 || positionOption > getMusicQueueLength()) {
+  if (positionOption < 1 || positionOption > musicQueue.getLength()) {
     embed.setTitle('Error')
       .setDescription(`${positionOption} does not refer to a valid position in the queue. See the queue using /queue`);
     await interaction.reply({
@@ -61,7 +61,7 @@ const executeRemoveItem = async (interaction: ChatInputCommandInteraction<CacheT
     return;
   }
 
-  const queueItem = removeQueueItem(positionOption - 1);
+  const queueItem = musicQueue.removeQueueItem(positionOption - 1);
   embed.setTitle('Remove')
     .setDescription(`Successfully removed item ${queueItem.musicTitle} from position ${positionOption} of the queue`);
   await interaction.reply({
@@ -73,7 +73,7 @@ const executeRemoveItem = async (interaction: ChatInputCommandInteraction<CacheT
 
 const executeRemoveRange = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const embed = new EmbedBuilder();
-  const queueLength = getMusicQueueLength();
+  const queueLength = musicQueue.getLength();
   const startPosition = interaction.options.getInteger('start');
   const endPosition = interaction.options.getInteger('end');
   if (startPosition < 1 
@@ -92,7 +92,7 @@ const executeRemoveRange = async (interaction: ChatInputCommandInteraction<Cache
     return;
   }
 
-  const removedItems = removeQueueItemsRange(startPosition, endPosition);
+  const removedItems = musicQueue.removeQueueItemsRange(startPosition, endPosition);
   embed.setTitle('Remove')
     .setDescription('Removed the following items from the queue: ');
   removedItems.forEach((musicQueueItem, index) => {

@@ -5,7 +5,7 @@ import {
   clearQueue, 
   getMusicQueueLength,
   getMusicQueueItem
-} from '../queue/songQueue';
+} from '../queue/musicQueue';
 
 beforeEach(() => {
   clearQueue();

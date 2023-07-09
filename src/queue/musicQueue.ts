@@ -45,6 +45,11 @@ export const musicQueue = {
   getIterator: () => {
     return queue.values();
   },
+  getQueueSliceIterator: (start: number, end: number) => {
+    return queue
+      .slice(start, end)
+      .values();
+  },
   getItem: (index: number) => {
     if (index <= 0) return undefined;
     return queue.at(index - 1);

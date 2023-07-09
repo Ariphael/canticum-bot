@@ -1,7 +1,7 @@
 import { Client, ChatInputCommandInteraction, CacheType, EmbedBuilder, ApplicationCommandOptionType } from "discord.js";
 import { Command } from "../interfaces/command-interface";
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
-import { dequeue, getMusicQueueItem, getMusicQueueLength } from "../queue/songQueue";
+import { musicQueue } from "../queue/musicQueue";
 
 const musicPlayer = MusicPlayer.getMusicPlayerInstance();
 
@@ -56,7 +56,7 @@ const executeSkip = async (_client: Client, interaction: ChatInputCommandInterac
 const executeSkipTo = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
   const position = interaction.options.getInteger('position');
 
-  if (getMusicQueueItem(position) === undefined) {
+  if (musicQueue.getItem(position) === undefined) {
     embed.setTitle('Error')
       .setDescription(`There exists no song at position ${position} in the queue. Use /queue to view the queue`);
     await interaction.reply({
@@ -76,7 +76,7 @@ const executeSkipNext = async (interaction: ChatInputCommandInteraction<CacheTyp
     musicPlayer.stopAudioPlayer();
     musicPlayer.playAudio()
     embed.setTitle('Skip')
-      .setDescription(getMusicQueueLength() === 0
+      .setDescription(musicQueue.getLength() === 0
         ? 'Skipped the current song. Queue is empty!'
         : 'Skipped to next song in queue');
     await interaction.reply({
@@ -102,7 +102,7 @@ const skipToPositionInQueue = async (
   position: number,
 ) => {
   for (var dequeueIterator = 0; dequeueIterator < position - 1; dequeueIterator++) {
-    dequeue();
+    musicQueue.dequeue();
   };
 
   try {

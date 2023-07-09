@@ -10,6 +10,7 @@ const readyListenerFn = (client: Client, commandCollection: Collection<string, C
     if (client.user !== null) {
       if (!client.application) return;
       await client.application.commands.set(Array.from(commandCollection.values()));
+
       console.log(`Ready! Logged in as ${client.user.tag} (ID: ${client.user.id})`);
     }
   }

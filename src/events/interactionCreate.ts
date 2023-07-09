@@ -18,17 +18,23 @@ const interactionCreateListenerFn = (
 
       const slashCommand = commandCollection.get(interaction.commandName);
       if (slashCommand === undefined) {
-        await interaction.reply({ content: "An error has occurred!", ephemeral: true });
+        interaction.reply({ content: "An error has occurred!", ephemeral: true });
         return;
       }
 
       try {
         await slashCommand.run(client, interaction);
       } catch (error) {
-        await interaction.reply({ 
-          content: 'There was an error while executing this command!', 
-          ephemeral: true 
-        });
+        console.log(error);
+        interaction
+          .reply({ 
+            content: `${error}`, 
+            ephemeral: true 
+          })
+          .catch(() => interaction.editReply({
+            content: `${error}`,          
+          }))
+          .catch((reason) => console.error(`${reason}`));
       }
     } 
   } 

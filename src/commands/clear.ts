@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
-import { clearQueue } from "../queue/songQueue";
+import { musicQueue } from "../queue/musicQueue";
 import { Command } from "../interfaces/command-interface";
 
 export const clear: Command = {
@@ -11,7 +11,7 @@ export const clear: Command = {
 };
 
 const executeClear = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  const queueClearSuccessFlag = clearQueue().length === 0;
+  const queueClearSuccessFlag = musicQueue.clear().length === 0;
   const embed = new EmbedBuilder()
     .setColor(0x0099FF)
     .setTitle('Clear')
