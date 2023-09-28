@@ -8,12 +8,12 @@ import {
   EmbedBuilder,
   VoiceChannel,
 } from 'discord.js';
-import { entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
+import { entersState, getVoiceConnection, joinVoiceChannel, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
 
 export const connect: Command = {
   name: 'connect',
-  description: 'Connect to voice channel',
+  description: 'Connect to/move to another voice channel',
   options: [{
     type: ApplicationCommandOptionType.Channel,
     name: 'channel',
@@ -30,6 +30,7 @@ const executeConnect = async (_client: Client, interaction: ChatInputCommandInte
   const embed = new EmbedBuilder()
     .setColor(0x0099FF)
     .setTitle('Connect');
+  const connection = getVoiceConnection(interaction.guild!.id);
 
   // requestedChannel and interaction.guild will never be null
   // @ts-ignore
@@ -39,9 +40,16 @@ const executeConnect = async (_client: Client, interaction: ChatInputCommandInte
     guildId: interaction.guild!.id,
     adapterCreator: interaction.guild!.voiceAdapterCreator,
   });
+  const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
 
-  MusicPlayer.getMusicPlayerInstance()
-    .addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection);
-  embed.setDescription(`Connected to voice channel ${requestedChannel.name}`);
+  if (connection)
+    (connection as VoiceConnection).destroy();
+
+  musicPlayerInstance.addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection);
+  embed.setDescription(
+    musicPlayerInstance.isAudioResourcePlayable()
+    ? `Connected to voice channel ${requestedChannel.name}. The audio player is currently ${musicPlayerInstance.isPaused() ? 'paused' : 'unpaused'}`
+    : `Connected to voice channel ${requestedChannel.name}. Add a song to the queue with '/play'!`
+  );
   await interaction.reply({ content: '', components: [], embeds: [embed] });
 };

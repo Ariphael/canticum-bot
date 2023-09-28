@@ -10,7 +10,7 @@ import { MusicPlayer } from '../musicplayer/MusicPlayer';
 
 export const disconnect: Command = {
   name: 'disconnect',
-  description: 'Disconnect from voice channel. Stops and destroys any resource associated with the audio player',
+  description: 'Disconnect from voice channel. Pauses any resource associated with the audio player',
   run: async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
     await executeDisconnect(client, interaction);
   }
@@ -24,8 +24,8 @@ const executeDisconnect = async (_client: Client, interaction: ChatInputCommandI
   const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
   
   if (connection) {
-    if (musicPlayerInstance.isPlayingAudio()) 
-      musicPlayerInstance.stopAudioPlayer();
+    if (musicPlayerInstance.isAudioResourcePlayable()) 
+      musicPlayerInstance.pauseAudio();
     (connection as VoiceConnection).destroy();
     embed.setDescription(
       `Successfully disconnected from voice channel`);
