@@ -28,7 +28,7 @@ export const queue: Command = {
 const executeQueue = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   const queueMaxPage = Math.ceil(musicQueue.getLength() / resultsPerPage);
   const musicQueueLength = musicQueue.getLength();
-  const pageOption = interaction.options.get('page').value as number;
+  const pageOption = interaction.options.get('page') ? interaction.options.get('page').value as number : null;
   const pageNum = pageOption === null
     ? 0
     : Math.min(pageOption - 1, queueMaxPage);
