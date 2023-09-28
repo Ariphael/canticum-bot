@@ -31,21 +31,13 @@ export const enqueueYouTubePlaylistRequest = async (url: string): Promise<EmbedB
     throw new Error(emptyYouTubePlaylistURLErrorStr);
   }
 
-  do {
+  while (playlistItems !== undefined) {
+    enqueuePlaylistItems(playlistItems, playlistId);
     const nextPageToken = playlistItems.data.nextPageToken;
-    playlistItems.data.items.forEach(playlistItem => {
-      const musicId = playlistItem.snippet.resourceId.videoId;
-      musicQueue.enqueue({
-        musicTitle: playlistItem.snippet.title,
-        musicId: musicId,
-        uploader: playlistItem.snippet.channelTitle,
-        originalURL: `https://www.youtube.com/watch?v=${musicId}&list=${playlistId}`
-      });
-    });
-    playlistItems = await axios.get(
+    playlistItems = nextPageToken !== undefined ? await axios.get(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&pageToken=${nextPageToken}&playlistId=${playlistId}&key=${process.env.YOUTUBE_API_KEY}`
-    );
-  } while (playlistItems.data.nextPageToken !== undefined);  
+    ) : undefined;
+  }
 
   try {
     const playlistInfo = await axios.get(
@@ -98,4 +90,16 @@ export const enqueueYouTubeSongRequest = async (url: string): Promise<EmbedBuild
     throw new Error(reason.message);
   }
   return embed;
+}
+
+const enqueuePlaylistItems = (playlistItems: AxiosResponse<any, any>, playlistId: string) => {
+  playlistItems.data.items.forEach(playlistItem => {
+    const musicId = playlistItem.snippet.resourceId.videoId;
+    musicQueue.enqueue({
+      musicTitle: playlistItem.snippet.title,
+      musicId: musicId,
+      uploader: playlistItem.snippet.channelTitle,
+      originalURL: `https://www.youtube.com/watch?v=${musicId}&list=${playlistId}`
+    });
+  });
 }
