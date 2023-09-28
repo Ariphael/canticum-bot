@@ -29,8 +29,8 @@ export const swap: Command = {
 
 const executeSwap = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   const embed = new EmbedBuilder();
-  const positionA = interaction.options.getInteger('pos1');
-  const positionB = interaction.options.getInteger('pos2');
+  const positionA = interaction.options.get('pos1').value as number;
+  const positionB = interaction.options.get('pos2').value as number;
   if (musicQueue.getItem(positionA) === undefined || musicQueue.getItem(positionB) === undefined) {
     embed.setTitle('Error')
       .setDescription('positionA and positionB must refer to valid positions in the queue. See queue using /queue');

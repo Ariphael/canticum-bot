@@ -43,7 +43,7 @@ const executeLoop = async (_client: Client, interaction: ChatInputCommandInterac
   const embed = new EmbedBuilder();
   const subcommand = interaction.options.getSubcommand();
 
-  if (getVoiceConnection(interaction.guild.id) === undefined) {
+  if (getVoiceConnection(interaction.guild!.id) === undefined) {
     embed.setTitle('Error')
       .setDescription('There is no established voice connection!');
     await interaction.reply({
@@ -64,9 +64,21 @@ const executeLoop = async (_client: Client, interaction: ChatInputCommandInterac
 };
 
 const executeLoopCurrSong = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
+  if (musicPlayerInstance.getCurrentPlayingSongInfo() === undefined) {
+    embed.setTitle('Error')
+      .setDescription('No song to loop');
+    await interaction.reply({
+      content: '',
+      components: [],
+      embeds: [embed],
+      ephemeral: true,      
+    });
+    return;
+  }
+
   musicPlayerInstance.switchToLoopCurrSongState();
   embed.setTitle('Loop')
-    .setDescription(`Looping song ${musicPlayerInstance.getCurrentPlayingSongInfo().musicTitle}`);
+    .setDescription(`Looping song ${musicPlayerInstance.getCurrentPlayingSongInfo()!.musicTitle}`);
   await interaction.reply({
     content: '',
     components: [],

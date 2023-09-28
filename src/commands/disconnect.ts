@@ -20,11 +20,12 @@ const executeDisconnect = async (_client: Client, interaction: ChatInputCommandI
   const embed = new EmbedBuilder()
     .setColor(0x0099FF)
     .setTitle('Disconnect');
-  const connection = getVoiceConnection(interaction.guild.id);
+  const connection = getVoiceConnection(interaction.guild!.id);
   const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
   
   if (connection) {
-    if (musicPlayerInstance.isPlayingAudio()) musicPlayerInstance.stopAudioPlayer();
+    if (musicPlayerInstance.isPlayingAudio()) 
+      musicPlayerInstance.stopAudioPlayer();
     (connection as VoiceConnection).destroy();
     embed.setDescription(
       `Successfully disconnected from voice channel`);

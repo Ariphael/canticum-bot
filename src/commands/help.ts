@@ -1,11 +1,12 @@
 import { Command } from '../interfaces/command-interface';
 import { embeds, getCommandEmbed } from '../embeds/helpEmbeds';
-import { helpButtons } from '../buttons/help.buttons';
+// import { helpButtons } from '../buttons/help.buttons';
 import { 
   ApplicationCommandOptionType, 
   CacheType, 
   ChatInputCommandInteraction, 
   Client, 
+  CommandInteractionOptionResolver, 
   EmbedBuilder
 } from 'discord.js';
 
@@ -24,13 +25,17 @@ export const help: Command = {
 }; 
 
 const executeHelp = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  if (interaction.options.get('command')) {
-    const commandEmbed: EmbedBuilder = getCommandEmbed(interaction.options.getString('command'));
+  const commandInteractionOption = interaction.options.get('command');
+  if (commandInteractionOption) {
+    const commandOption: String = commandInteractionOption.value as String;
+    const commandEmbed: EmbedBuilder = getCommandEmbed(commandOption);
     await interaction.reply({ content: '', components: [], embeds: [commandEmbed]});
     return;
   } 
 
-  helpButtons.handleInteraction(interaction.channel);
+  // TODO refactor buttons
+  // helpButtons.handleInteraction(interaction.channel);
 
-  await interaction.reply({ content: '', components: [helpButtons.row], embeds: [embeds[0]] });
+  // await interaction.reply({ content: '', components: [helpButtons.row], embeds: [embeds[0]] });
+  await interaction.reply({ content: '', components: [], embeds: [embeds[0]] });
 };

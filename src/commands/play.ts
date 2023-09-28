@@ -37,8 +37,8 @@ export const play: Command = {
 };
 
 const executePlay = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  const query = interaction.options.getString('query');
-  const voiceConnection = getVoiceConnection(interaction.guild.id);
+  const query = interaction.options.get('query').value as string;
+  const voiceConnection = getVoiceConnection(interaction.guild!.id);
   const musicQueueOldLength = musicQueue.getLength();
 
   if (voiceConnection === undefined) {

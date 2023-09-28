@@ -6,6 +6,7 @@ import {
   ChatInputCommandInteraction, 
   Client,
   EmbedBuilder,
+  VoiceChannel,
 } from 'discord.js';
 import { entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
@@ -29,11 +30,14 @@ const executeConnect = async (_client: Client, interaction: ChatInputCommandInte
   const embed = new EmbedBuilder()
     .setColor(0x0099FF)
     .setTitle('Connect');
-  const requestedChannel = interaction.options.getChannel('channel');
+
+  // requestedChannel and interaction.guild will never be null
+  // @ts-ignore
+  const requestedChannel: VoiceChannel = interaction.options.getChannel('channel')!;
   const voiceConnection = joinVoiceChannel({
     channelId: requestedChannel.id,
-    guildId: interaction.guild.id,
-    adapterCreator: interaction.guild.voiceAdapterCreator,
+    guildId: interaction.guild!.id,
+    adapterCreator: interaction.guild!.voiceAdapterCreator,
   });
 
   MusicPlayer.getMusicPlayerInstance()

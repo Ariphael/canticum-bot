@@ -54,7 +54,7 @@ const executeSkip = async (_client: Client, interaction: ChatInputCommandInterac
 }
 
 const executeSkipTo = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
-  const position = interaction.options.getInteger('position');
+  const position = interaction.options.get('position').value as number;
 
   if (musicQueue.getItem(position) === undefined) {
     embed.setTitle('Error')

@@ -11,6 +11,7 @@ export const volume: Command = {
     type: ApplicationCommandOptionType.Number,
     name: 'vol',
     description: 'number between 0 and 1 representing the new volume of the resource',
+    required: true,
   }],
   run: async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
     await executeVolume(client, interaction);
@@ -18,7 +19,7 @@ export const volume: Command = {
 }
 
 const executeVolume = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  const volOption = interaction.options.getNumber('vol');
+  const volOption = interaction.options.get('vol').value as number;
   const embed = new EmbedBuilder();
   if (volOption < 0 || volOption > 1) {
     embed.setTitle('Error')

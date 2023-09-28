@@ -12,7 +12,7 @@ export const pause: Command = {
 }; 
 
 const executePause = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  const voiceConnection = getVoiceConnection(interaction.guild.id);
+  const voiceConnection = getVoiceConnection(interaction.guild!.id);
   const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
   const embed = new EmbedBuilder();
 
