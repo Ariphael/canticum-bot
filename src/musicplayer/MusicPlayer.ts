@@ -12,9 +12,10 @@ import { AudioResourceManager } from "./audioresource/AudioResourceManager";
 export { MusicPlayer };
 
 class MusicPlayer {
-  static musicPlayerSingletonInstance: MusicPlayer = null;
+  static musicPlayerSingletonInstance: MusicPlayer | undefined = undefined;
   private audioPlayer: AudioPlayer;
   private audioResourceManager: AudioResourceManager;
+  private paused: boolean;
 
   constructor() {
     this.audioPlayer = createAudioPlayer({
@@ -23,6 +24,7 @@ class MusicPlayer {
       },
     });
     this.audioResourceManager = new AudioResourceManager();
+    this.paused = false;
   }
 
   public playAudio(): boolean {
@@ -35,14 +37,20 @@ class MusicPlayer {
   }
 
   public isPlayingAudio(): boolean {
+    return !this.paused && this.audioPlayer.checkPlayable();
+  }
+
+  public isAudioResourcePlayable(): boolean {
     return this.audioPlayer.checkPlayable();
   }
 
   public pauseAudio(): boolean {
+    this.paused = false;
     return this.audioPlayer.pause();
   }
 
   public unpauseAudio(): boolean {
+    this.paused = true;
     return this.audioPlayer.unpause();
   }
 
@@ -50,16 +58,20 @@ class MusicPlayer {
     return this.audioResourceManager.resourceSetVolume(volume);
   }
 
-  public addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection: VoiceConnection): PlayerSubscription {
+  public addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection: VoiceConnection): PlayerSubscription | undefined {
     return voiceConnection.subscribe(this.audioPlayer);
   }
 
-  public getCurrentPlayingSongInfo(): MusicQueueItemType {
+  public getCurrentPlayingSongInfo(): MusicQueueItemType | undefined {
     return this.audioResourceManager.getCurrentPlayingSongInfo();
   }
 
   public isLoopingOn(): boolean {
     return this.audioResourceManager.isLoopingOn();
+  }
+
+  public isPaused(): boolean {
+    return this.paused;
   }
 
   public switchToLoopCurrSongState() {
@@ -78,7 +90,7 @@ class MusicPlayer {
   }
 
   public static getMusicPlayerInstance() {
-    if (this.musicPlayerSingletonInstance === null) {
+    if (this.musicPlayerSingletonInstance === undefined) {
       return this.musicPlayerSingletonInstance = new MusicPlayer();
     }
     return this.musicPlayerSingletonInstance;
