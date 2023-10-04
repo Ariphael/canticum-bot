@@ -12,8 +12,8 @@ import { MusicQueueItemType } from '../../types/musicQueueItem';
 export { AudioResourceNormalState };
 
 class AudioResourceNormalState implements AudioResourceState {
-  private audioResource: AudioResource;
-  private currentPlayingMusicQueueItem: MusicQueueItemType;
+  private audioResource: AudioResource | undefined;
+  private currentPlayingMusicQueueItem: MusicQueueItemType | undefined;
   private resourceVolume: number;
 
   constructor() {
@@ -30,7 +30,7 @@ class AudioResourceNormalState implements AudioResourceState {
     return this.currentPlayingMusicQueueItem;
   }
 
-  public setCurrentPlayingSong(musicQueueItem: MusicQueueItemType): MusicQueueItemType {
+  public setCurrentPlayingSong(musicQueueItem: MusicQueueItemType | undefined): MusicQueueItemType | undefined {
     return this.currentPlayingMusicQueueItem = musicQueueItem;
   }
 
@@ -38,7 +38,8 @@ class AudioResourceNormalState implements AudioResourceState {
     if (audioPlayer.listenerCount(AudioPlayerStatus.Idle) >= 1) return undefined;
     return audioPlayer.on(AudioPlayerStatus.Idle, () => {
       this.currentPlayingMusicQueueItem = undefined;
-      if (!this.doPlayAudio(audioPlayer)) audioPlayer.stop();
+      if (!this.doPlayAudio(audioPlayer)) 
+        audioPlayer.stop();
     });  
   }
 
@@ -47,7 +48,7 @@ class AudioResourceNormalState implements AudioResourceState {
       return false;
     }
     this.resourceVolume = volume;
-    this.audioResource.volume.setVolume(volume);
+    this.audioResource.volume!.setVolume(volume);
     return true;
   }
 
@@ -72,7 +73,7 @@ class AudioResourceNormalState implements AudioResourceState {
           inlineVolume: true,
         }
       );
-      this.audioResource.volume.setVolume(this.resourceVolume);
+      this.audioResource.volume!.setVolume(this.resourceVolume);
       audioPlayer.play(this.audioResource);
       this.currentPlayingMusicQueueItem = nextMusicQueueItem;
       return true;

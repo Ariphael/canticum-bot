@@ -6,7 +6,7 @@ export const musicQueue = {
   enqueue: (musicQueueItem: MusicQueueItemType): number => {
     return queue.push(musicQueueItem);
   },
-  dequeue: (): MusicQueueItemType => {
+  dequeue: (): MusicQueueItemType | undefined => {
     return queue.shift();
   },
   swapQueuePositions: (positionA: number, positionB: number): boolean => {
@@ -31,7 +31,7 @@ export const musicQueue = {
   removeQueueItemsRange: (queuePosA: number, queuePosB: number): MusicQueueItemType[] | undefined => {
     return queuePosA > queuePosB || queuePosA <= 0 || queuePosB <= 0 
       ? undefined
-      : queue.splice(queuePosA - 1, queuePosB - 1 - queuePosA + 2);
+      : queue.splice(queuePosA - 1, queuePosB - queuePosA + 1);
   },
   shuffle: (): MusicQueueItemType[] => {
     for (let i = queue.length - 1; i > 0; i--) {

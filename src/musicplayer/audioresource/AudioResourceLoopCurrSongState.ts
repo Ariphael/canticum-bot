@@ -12,8 +12,8 @@ import { AudioResourceState } from "./AudioResourceState";
 export { AudioResourceLoopCurrSongState };
 
 class AudioResourceLoopCurrSongState implements AudioResourceState {
-  private audioResource: AudioResource;
-  private currentPlayingMusicQueueItem: MusicQueueItemType;
+  private audioResource: AudioResource | undefined;
+  private currentPlayingMusicQueueItem: MusicQueueItemType | undefined;
   private resourceVolume: number;
 
   constructor() {
@@ -31,7 +31,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
       return false;
     }
     this.resourceVolume = volume;
-    this.audioResource.volume.setVolume(volume);
+    this.audioResource.volume!.setVolume(volume);
     return true;
   }
 
@@ -60,7 +60,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
       : this.currentPlayingMusicQueueItem;
       
     this.audioResource = createAudioResource(
-      ytdl(`https://www.youtube.com/watch?v=${nextMusicQueueItem.musicId}`, { 
+      ytdl(`https://www.youtube.com/watch?v=${nextMusicQueueItem!.musicId}`, { 
        filter: 'audioonly',
        highWaterMark: 1 << 62,
        liveBuffer: 1 << 62,
@@ -70,7 +70,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
        inlineVolume: true,
       }
     );
-    this.audioResource.volume.setVolume(this.resourceVolume);
+    this.audioResource.volume!.setVolume(this.resourceVolume);
     try {
       audioPlayer.play(this.audioResource);
     } catch (error) {

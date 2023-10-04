@@ -33,7 +33,7 @@ class AudioResourceManager {
     this.audioResourceState.setCurrentPlayingSong(undefined);
   }
 
-  public getCurrentPlayingSongInfo(): MusicQueueItemType {
+  public getCurrentPlayingSongInfo(): MusicQueueItemType | undefined {
     return this.audioResourceState.getCurrentPlayingSongInfo();
   }
 

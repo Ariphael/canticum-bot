@@ -7,8 +7,8 @@ import { AudioResourceState } from "./AudioResourceState";
 export { AudioResourceLoopQueueState };
 
 class AudioResourceLoopQueueState implements AudioResourceState {
-  private audioResource: AudioResource;
-  private currentPlayingMusicQueueItem: MusicQueueItemType;
+  private audioResource: AudioResource | undefined;
+  private currentPlayingMusicQueueItem: MusicQueueItemType | undefined;
   private musicQueueIterator: IterableIterator<MusicQueueItemType>;
   private resourceVolume: number;
 
@@ -27,7 +27,7 @@ class AudioResourceLoopQueueState implements AudioResourceState {
     return this.currentPlayingMusicQueueItem;
   }
 
-  public setCurrentPlayingSong(musicQueueItem: MusicQueueItemType): MusicQueueItemType {
+  public setCurrentPlayingSong(musicQueueItem: MusicQueueItemType | undefined): MusicQueueItemType | undefined {
     return this.currentPlayingMusicQueueItem = musicQueueItem;
   }
 
@@ -44,7 +44,7 @@ class AudioResourceLoopQueueState implements AudioResourceState {
       return false;
     }
     this.resourceVolume = volume;
-    this.audioResource.volume.setVolume(volume);
+    this.audioResource.volume!.setVolume(volume);
     return true;
   }
 
@@ -65,7 +65,7 @@ class AudioResourceLoopQueueState implements AudioResourceState {
     }
     
     const audioStream = 
-      ytdl(`https://www.youtube.com/watch?v=${this.currentPlayingMusicQueueItem.musicId}`, {
+      ytdl(`https://www.youtube.com/watch?v=${this.currentPlayingMusicQueueItem!.musicId}`, {
         filter: 'audioonly',
         highWaterMark: 1 << 62,
         liveBuffer: 1 << 62,
@@ -77,7 +77,7 @@ class AudioResourceLoopQueueState implements AudioResourceState {
       inlineVolume: true,
     });
 
-    this.audioResource.volume.setVolume(this.resourceVolume);
+    this.audioResource.volume!.setVolume(this.resourceVolume);
     
     try {
       audioPlayer.play(this.audioResource);

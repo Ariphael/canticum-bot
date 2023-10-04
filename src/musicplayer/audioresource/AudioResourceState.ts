@@ -4,7 +4,7 @@ import { MusicQueueItemType } from "../../types/musicQueueItem";
 export interface AudioResourceState {
   playAudio(audioPlayer: AudioPlayer): boolean,
   getCurrentPlayingSongInfo(): MusicQueueItemType | undefined,
-  setCurrentPlayingSong(musicQueueItem: MusicQueueItemType): MusicQueueItemType,
+  setCurrentPlayingSong(musicQueueItem: MusicQueueItemType | undefined): MusicQueueItemType | undefined,
   setAudioPlayerStatusIdleListener(audioPlayer: AudioPlayer): AudioPlayer | undefined,
   resourceSetVolume(volume: number): boolean,
   getResourceVolume(): number
