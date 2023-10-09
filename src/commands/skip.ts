@@ -36,7 +36,7 @@ const executeSkip = async (_client: Client, interaction: ChatInputCommandInterac
   if (!musicPlayer.isPlayingAudio()) {
     embed
       .setTitle('Error')
-      .setDescription('there is no way underlying resource that is playable.');
+      .setDescription('there is no underlying resource that is playable.');
     await interaction.reply({
       content: '',
       components: [],
