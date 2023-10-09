@@ -1,6 +1,7 @@
 import fs from 'fs';
 import * as dotenv from 'dotenv';
-import * as process from 'process';
+// import * as process from 'process';
+import * as db from './utils/database';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { addReadyEventToClient } from './events/ready';
 import { addInteractionCreateEventToClient } from './events/interactionCreate';
@@ -29,6 +30,8 @@ export const startCanticum = async (client: Client<boolean>) => {
   addReadyEventToClient(client, commandCollection);
   addInteractionCreateEventToClient(client, commandCollection);
 
+  db.init();
+
   await client.login(process.env.DISCORD_TOKEN);
 };
 
@@ -47,8 +50,11 @@ const getCommands = async (): Promise<Collection<string, Command>> => {
 };
 
 const setupCleanupActionOnExit = () => {
-  process.on('exit', () => MusicPlayer.getMusicPlayerInstance().stopAudioPlayer());
-  process.on('SIGINT', () => MusicPlayer.getMusicPlayerInstance().stopAudioPlayer());
+  process.on('SIGINT', () => {
+    MusicPlayer.getMusicPlayerInstance().stopAudioPlayer();
+    db.exit();
+    process.exit();
+  });
 }
 
 startCanticum(client);
