@@ -26,11 +26,10 @@ const interactionCreateListenerFn = (
         await slashCommand.run(client, interaction);
       } catch (error) {
         console.log(error);
-        interaction
-          .reply({ 
-            content: `${error}`, 
-            ephemeral: true 
-          })
+        interaction.reply({ 
+          content: `${error}`, 
+          ephemeral: true 
+        })
           .catch(() => interaction.editReply({
             content: `${error}`,          
           }))
