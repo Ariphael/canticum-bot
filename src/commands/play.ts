@@ -9,16 +9,7 @@ import {
 } from 'discord.js';
 import { MusicPlayer } from '../musicplayer/MusicPlayer';
 import { getVoiceConnection } from '@discordjs/voice';
-import { 
-  enqueueMusicSpotify, 
-  enqueueMusicYouTube, 
-  enqueueMusicYouTubeNonURLQuery
-} from './utils/queue';
-
-const youtubeURLRegExp = 
-  /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
-const spotifyURLRegExp = 
-  /^(?:spotify:|(?:https?:\/\/(?:open|play)\.spotify\.com\/))(?:embed)?\/?(playlist|track)(?::|\/)((?:[0-9a-zA-Z]){22})/;
+import { enqueueMusicAndBuildEmbed } from './utils/queue';
 
 const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
 
@@ -29,7 +20,7 @@ export const play: Command = {
     type: ApplicationCommandOptionType.String,
     name: 'query',
     description: 'youtube or spotify link or query',
-    required: true,
+    required: false,
   }],
   run: async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
     await executePlay(client, interaction);
@@ -37,13 +28,31 @@ export const play: Command = {
 };
 
 const executePlay = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
-  const query = interaction.options.get('query').value as string;
+  const embed = new EmbedBuilder();
+  const query = interaction.options.get('query')
+    ? interaction.options.get('query').value as string
+    : undefined;
   const voiceConnection = getVoiceConnection(interaction.guild!.id);
   const musicQueueOldLength = musicQueue.getLength();
 
+  if (query === undefined) {
+    if (!musicPlayerInstance.isPlayingAudio()) {
+      musicPlayerInstance.playAudio();
+      embed.setTitle('Play')
+        .setDescription('Commenced playback')
+        .setTimestamp();
+      return interaction.reply({ content: '', components: [], embeds: [embed] });
+    }
+    embed.setTitle('Error')
+      .setDescription(musicPlayerInstance.isPaused 
+        ? 'Playback is paused. Use /unpause instead.' 
+        : 'Music player is currently playing audio')
+      .setTimestamp();
+    return interaction.reply({ content: '', components: [], embeds: [embed] });
+  }
+
   if (voiceConnection === undefined) {
-    const embed = new EmbedBuilder()
-      .setTitle('Error')
+    embed.setTitle('Error')
       .setDescription('Must be connected to voice channel first!');
     await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
     return;
@@ -53,14 +62,7 @@ const executePlay = async (_client: Client, interaction: ChatInputCommandInterac
   // a substantial amount of time may be consumed by fetching items in a long playlist.
   await interaction.deferReply();
 
-  const isQueryYouTubeURL = youtubeURLRegExp.test(query);
-  const isQuerySpotifyURL = spotifyURLRegExp.test(query);
-
-  const embed: EmbedBuilder = isQueryYouTubeURL
-    ? await enqueueMusicYouTube(query)
-    : (isQuerySpotifyURL
-      ? await enqueueMusicSpotify(query)
-      : await enqueueMusicYouTubeNonURLQuery(query));
+  await enqueueMusicAndBuildEmbed(query, embed);
 
   if (musicQueueOldLength === 0 && !musicPlayerInstance.isPlayingAudio()) {
     musicPlayerInstance.playAudio();
