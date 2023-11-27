@@ -10,8 +10,7 @@ const invalidYouTubeVideoURLErrorStr =
 const playlistForbiddenErrorStr = 'Playlist identified forbids access';
 const apiErrorStr = 'YouTube API error';
 
-export const enqueueYouTubePlaylistRequest = async (url: string): Promise<EmbedBuilder> => {
-  const embed = new EmbedBuilder();
+export const enqueueYouTubePlaylistRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
   const playlistId = new URL(url).searchParams.get('list');
   var playlistItems: AxiosResponse<any, any>;
 
@@ -61,10 +60,9 @@ export const enqueueYouTubePlaylistRequest = async (url: string): Promise<EmbedB
   }
 }
 
-export const enqueueYouTubeSongRequest = async (url: string): Promise<EmbedBuilder> => {
-  const embed = new EmbedBuilder();
+export const enqueueYouTubeSongRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
   const musicId = new URL(url).searchParams.get('v');
-    
+
   try {
     const videoInfo = await axios.get(
       `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&id=${musicId}&maxResults=1&key=${process.env.YOUTUBE_API_KEY}`

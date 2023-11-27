@@ -8,8 +8,7 @@ const emptySpotifyAlbumErrorStr = 'Spotify album is empty';
 const spotifyApiErrorStr = 'Spotify API did not respond';
 const maxNoAttemptsItemFetch = 2;
 
-export const enqueueSpotifyPlaylistRequest = async (url: string): Promise<EmbedBuilder> => {
-  const embed = new EmbedBuilder();
+export const enqueueSpotifyPlaylistRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
   const pathname = new URL(url).pathname;
   const playlistId = pathname.slice(pathname.lastIndexOf('/') + 1);
 
@@ -40,8 +39,7 @@ export const enqueueSpotifyPlaylistRequest = async (url: string): Promise<EmbedB
   return embed;
 }
 
-export const enqueueSpotifyAlbumRequest = async (url: string) => {
-  const embed = new EmbedBuilder();
+export const enqueueSpotifyAlbumRequest = async (url: string, embed: EmbedBuilder) => {
   const pathname = new URL(url).pathname;
   const albumId = pathname.slice(pathname.lastIndexOf('/') + 1);
 
@@ -71,8 +69,7 @@ export const enqueueSpotifyAlbumRequest = async (url: string) => {
   return embed;
 }
 
-export const enqueueSpotifyTrackRequest = async (url: string): Promise<EmbedBuilder> => {
-  const embed = new EmbedBuilder();
+export const enqueueSpotifyTrackRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
   const pathname = new URL(url).pathname;
   const trackId = pathname.slice(pathname.lastIndexOf('/') + 1);
 
