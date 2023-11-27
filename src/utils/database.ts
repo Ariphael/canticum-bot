@@ -1,4 +1,5 @@
 import * as mysql from 'mysql';
+import { RowDataPacket } from 'mysql2';
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -12,20 +13,18 @@ export const init = () => connection.connect((connectError) => {
     throw connectError;
 });
 
-export const queryNoCallback = (sqlInput: string, args: Array<string | number>) => {
-  connection.query(sqlInput, args, (queryError) => {
-    if (queryError) throw queryError;
-  });
-}
-
-export const query = (sqlInput: string, args: Array<string | number>, resultCallback: Function) => {
-  connection.query(sqlInput, args, (queryError, result) => {
-    if (queryError) throw queryError;
-    resultCallback(result);
+export const query = (sqlInput: string, args: Array<string | number>): Promise<RowDataPacket[]> => {
+  return new Promise<RowDataPacket[]>((success, reject) => {
+    connection.query(sqlInput, args, (queryError, result) => {
+      if (queryError)
+        reject(queryError);
+      else
+        success(result);
+    });
   });
 }
 
 export const exit = () => connection.end((endError) => {
-    if (endError)
-        throw endError;
+  if (endError)
+    throw endError;
 })
