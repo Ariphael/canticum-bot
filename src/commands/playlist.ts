@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, CacheType, ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
 import { Command } from "../interfaces/command-interface";
-import { subcommandMapper } from "./utils/playlist/subcommand";
+import { subcommandMapper } from "./playlist/subcommand";
 
 export const playlist: Command = {
   name: 'playlist',
