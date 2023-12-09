@@ -1,6 +1,7 @@
 import { executePlaylistAddItem } from "./additem";
 import { executePlaylistCreate } from "./create";
 import { executePlaylistDelete } from "./delete";
+import { executePlaylistImport } from "./import";
 import { executePlaylistInfo } from "./info";
 import { executePlaylistLoadToQueue } from "./load";
 import { executePlaylistRemoveItem } from "./removeitem";
@@ -15,5 +16,6 @@ export const subcommandMapper = {
   'rename': executePlaylistRename,
   'additem': executePlaylistAddItem,
   'removeitem': executePlaylistRemoveItem,
+  'import': executePlaylistImport,
   'load': executePlaylistLoadToQueue,
 }
