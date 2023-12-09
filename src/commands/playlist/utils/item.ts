@@ -1,5 +1,4 @@
 import axios from "axios";
-import { MusicQueueItemType } from "../../../types/musicQueueItem";
 import { PlaylistItem } from "../../../types/playlistItem";
 
 const youtubeURLRegExp = 
