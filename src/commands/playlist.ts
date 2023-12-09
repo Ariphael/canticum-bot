@@ -126,7 +126,7 @@ export const playlist: Command = {
 const executePlaylist = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   const embed = new EmbedBuilder();
   const subcommand = interaction.options.getSubcommand();  
-  const subcommandFunction: (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => void
-    = subcommandMapper[subcommand];  
-  subcommandFunction(interaction, embed);
+  const subcommandFunction: (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => Promise<void>
+    = subcommandMapper[subcommand]; 
+  await subcommandFunction(interaction, embed);
 }
