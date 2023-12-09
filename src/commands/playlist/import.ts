@@ -17,7 +17,7 @@ export const executePlaylistImport = async (interaction: ChatInputCommandInterac
   ).then((result) => {
     if (result.length === 0) {
       embed.setTitle('Error')
-        .setDescription(`Playlist "${targetPlaylistName}" belonging to ${userMention(memberId)} does not exist.`)
+        .setDescription(`No playlist with name "${targetPlaylistName}" belonging to ${userMention(memberId)} exists.`)
         .setTimestamp();
       return interaction.reply({ content: '', components: [], embeds: [embed] });
     }
