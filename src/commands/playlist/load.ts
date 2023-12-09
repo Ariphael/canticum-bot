@@ -3,12 +3,12 @@ import * as db from '../../utils/database';
 import { musicQueue } from "../../queue/musicQueue";
 import { MusicPlayer } from "../../musicplayer/MusicPlayer";
 
-export const executePlaylistLoadToQueue = (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
+export const executePlaylistLoadToQueue = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
   const memberId = interaction.member.user.id;
   const playlistName = interaction.options.get('name').value as string;
   const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
 
-  db.query(
+  await db.query(
     'SELECT * FROM playlist WHERE userId = ? AND playlistName = ?', 
     [memberId, playlistName]
   ).then((result) => {
