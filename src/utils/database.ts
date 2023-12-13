@@ -9,15 +9,19 @@ const connection = mysql.createConnection({
 });
 
 export const init = () => connection.connect((connectError) => {
-  if (connectError)
+  if (connectError) {
+    console.error(`MySQl connection error. Please ensure you start the MySQL server.`);
     throw connectError;
+  }
 });
 
 export const query = (sqlInput: string, args: Array<string | number>): Promise<RowDataPacket[]> => {
   return new Promise<RowDataPacket[]>((success, reject) => {
     connection.query(sqlInput, args, (queryError, result) => {
-      if (queryError)
-        reject(queryError);
+      if (queryError) {
+        console.error(`MYSQL error: ${queryError.message}`);
+        reject(result);
+      }
       else
         success(result);
     });
