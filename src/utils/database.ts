@@ -4,7 +4,7 @@ import { RowDataPacket } from 'mysql2';
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'root',
+  password: process.env['MYSQL_PASSWORD'],
   database: 'canticum',
 });
 
