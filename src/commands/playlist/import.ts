@@ -9,7 +9,7 @@ export const executePlaylistImport = async (interaction: ChatInputCommandInterac
   const playlistInfo = await getYouTubePlaylistNameAndItemCount(url);
   const playlistItems = await createPlaylistItemsArrayFromYouTubePlaylist(url);
 
-  var nextPositionInPlaylist = await getNumberOfPlaylistItems(memberId, targetPlaylistName) + 1;
+  var initialSizeOfPlaylist = await getNumberOfPlaylistItems(memberId, targetPlaylistName);
 
   const result = await db.query(
     `SELECT * FROM playlist WHERE playlistName = ? AND userId = ?`,
@@ -17,13 +17,13 @@ export const executePlaylistImport = async (interaction: ChatInputCommandInterac
   );
 
   if (result.length === 0) {
-    embed.setTitle('Error')
-      .setDescription(`No playlist with name "${targetPlaylistName}" belonging to ${userMention(memberId)} exists.`)
-      .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
+    await db.query(
+      'INSERT INTO playlist (playlistName, userId) VALUES (?, ?)',
+      [targetPlaylistName, memberId]
+    );
   }
 
-  playlistItems.forEach(async (playlistItem) => {
+  playlistItems.forEach(async (playlistItem, playlistItemIndex) => {
     await db.query(
       `INSERT INTO playlist_items (title, uploader, musicId, originalURL, dateCreated) VALUES (?, ?, ?, ? ,?)`,
       [playlistItem.musicTitle, playlistItem.uploader, playlistItem.musicId, 
@@ -38,17 +38,16 @@ export const executePlaylistImport = async (interaction: ChatInputCommandInterac
 
     await db.query(
       'INSERT INTO playlist_content_map (playlistItemId, userId, playlistName, playlistPosition) VALUES (?, ?, ?, ?)',
-      [result[0].playlistItemId, memberId, targetPlaylistName, nextPositionInPlaylist]
+      [result[0].playlistItemId, memberId, targetPlaylistName, initialSizeOfPlaylist + playlistItemIndex + 1]
     );
-    nextPositionInPlaylist++;
-
-    embed.setTitle('Import')
-      .setDescription(
-        `${playlistInfo.itemCount} items from YouTube playlist "${playlistInfo.playlistName}" appended to playlist "${targetPlaylistName}" belonging to ${userMention(memberId)}`
-      )
-      .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
   });
+
+  embed.setTitle('Import')
+  .setDescription(
+    `${playlistInfo.itemCount} items from YouTube playlist "${playlistInfo.playlistName}" appended to playlist "${targetPlaylistName}" belonging to ${userMention(memberId)}`
+  )
+  .setTimestamp();
+  return await interaction.reply({ content: '', components: [], embeds: [embed] });
 }
 
 const getNumberOfPlaylistItems = async (memberId: string, playlistName: string): Promise<number> => {
