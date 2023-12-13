@@ -15,43 +15,42 @@ export const executePlaylistRemoveItem = async (interaction: ChatInputCommandInt
     embed.setTitle('Error')
       .setDescription('Invalid position value')
       .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
+    return await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
   }
 
-  db.query(
+  const result = await db.query(
     `SELECT * FROM playlist WHERE playlistName = ? AND userId = ?`,
     [playlistName, memberId]
-  ).then(async (result) => {
-    if (result.length === 0) {
-      embed.setTitle('Error')
-        .setDescription(`No such playlist with name "${playlistName}" belonging to ${userMention(memberId)} was found.`)
-        .setTimestamp();
-      return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true }); 
-    }  
-    const playlistItemTitle = await removeItemAndUpdatePositionsInDB(memberId, playlistName, positionInPlaylist);
-    embed.setTitle('Playlist')
-      .setDescription(`Removed ${playlistItemTitle} from position ${positionInPlaylist} of playlist ${playlistName}`)
-      .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
-  })
+  );
+
+  if (result.length === 0) {
+    embed.setTitle('Error')
+    .setDescription(`No playlist with name "${playlistName}" belonging to ${userMention(memberId)} was found.`)
+    .setTimestamp();
+    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });     
+  }
+
+  const playlistItemTitle = await removeItemAndUpdatePositionsInDB(memberId, playlistName, positionInPlaylist);
+  embed.setTitle('Playlist')
+    .setDescription(`Removed ${playlistItemTitle} from position ${positionInPlaylist} of playlist ${playlistName}`)
+    .setTimestamp();
+  return interaction.reply({ content: '', components: [], embeds: [embed] });
 }
 
 const removeItemAndUpdatePositionsInDB = async (memberId: string, playlistName: string, positionInPlaylist: number) => {
-  return db.query(
+  const result = await db.query(
     `SELECT title FROM playlist_items INNER JOIN playlist_content_map USING (playlistItemId) WHERE userId = ? AND playlistName = ? AND playlistPosition = ?`,
-    [memberId, playlistName, positionInPlaylist])
-    .then(result => {
-      const itemTitle = result[0].title as string;
-      db.query(
-        `DELETE FROM playlist_content_map WHERE userId = ? AND playlistName = ? AND playlistPosition = ?`,
-        [memberId, playlistName, positionInPlaylist]
-      );
-    
-      db.query(
-        `UPDATE playlist_content_map SET playlistPosition = playlistPosition - 1 WHERE userId = ? AND playlistName = ? AND playlistPosition > ?`,
-        [memberId, playlistName, positionInPlaylist]
-      );
+    [memberId, playlistName, positionInPlaylist]
+  );
+  
+  const itemTitle = result[0].title as string;
+  db.query(
+    `DELETE FROM playlist_content_map WHERE userId = ? AND playlistName = ? AND playlistPosition = ?`,
+    [memberId, playlistName, positionInPlaylist]
+  );
 
-      return itemTitle;
-    })
+  db.query(
+    `UPDATE playlist_content_map SET playlistPosition = playlistPosition - 1 WHERE userId = ? AND playlistName = ? AND playlistPosition > ?`,
+    [memberId, playlistName, positionInPlaylist]
+  );
 }
