@@ -1,6 +1,8 @@
 import fs from 'fs';
 import * as dotenv from 'dotenv';
-// import * as process from 'process';
+
+dotenv.config();
+
 import * as db from './utils/database';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { addReadyEventToClient } from './events/ready';
@@ -8,8 +10,6 @@ import { addInteractionCreateEventToClient } from './events/interactionCreate';
 import { Command } from './interfaces/command-interface';
 import { refreshSpotifyAccessToken, scheduleHourlySpotifyAccessTokenRenewal } from './utils/spotify';
 import { MusicPlayer } from './musicplayer/MusicPlayer';
-
-dotenv.config();
 
 const client = new Client({
   intents: [
