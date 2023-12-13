@@ -4,13 +4,15 @@ import { RowDataPacket } from 'mysql2';
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: process.env['MYSQL_PASSWORD'],
+  password: process.env['MYSQL_PASSWORD']!,
   database: 'canticum',
 });
 
 export const init = () => connection.connect((connectError) => {
   if (connectError) {
-    console.error(`MySQl connection error. Please ensure you start the MySQL server.`);
+    console.error(
+      `MySQL connection error. Please ensure you start the MySQL server and connection configuration parameters are correct.`
+    );
     throw connectError;
   }
 });
