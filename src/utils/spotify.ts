@@ -47,8 +47,8 @@ export const scheduleHourlySpotifyAccessTokenRenewal = () => {
     console.log("refreshing spotify access token...");
     const bodyParams = {
       grant_type: 'refresh_token',
-      refresh_token: process.env['SPOTIFY_REFRESH_TOKEN'],
-      client_id: process.env['SPOTIFY_API_ID']
+      refresh_token: process.env['SPOTIFY_REFRESH_TOKEN']!,
+      client_id: process.env['SPOTIFY_API_ID']!
     };
 
     const configParams = {
@@ -76,9 +76,9 @@ export const refreshTokenRevocationExceptionHandler = async () => {
 
   // const codeChallenge = generateCodeChallenge(process.env['SPOTIFY_CODE_VERIFIER']);
   const userAuthorizationRequestQueryParameters = new URLSearchParams({
-    client_id: process.env['SPOTIFY_API_ID'],
+    client_id: process.env['SPOTIFY_API_ID']!,
     response_type: 'code',
-    redirect_uri: process.env['SPOTIFY_REDIRECT_URI'],
+    redirect_uri: process.env['SPOTIFY_REDIRECT_URI']!,
   });
   const requestURL = 
     `https://accounts.spotify.com/authorize?${userAuthorizationRequestQueryParameters.toString()}`;
@@ -106,7 +106,7 @@ const doRequestAccessToken = (authCode: String, attempt: number) => {
   const bodyParams = {
     grant_type: 'authorization_code',
     code: authCode,
-    redirect_uri: process.env['SPOTIFY_REDIRECT_URI'],
+    redirect_uri: process.env['SPOTIFY_REDIRECT_URI']!,
   };
 
   const base64Auth = 
