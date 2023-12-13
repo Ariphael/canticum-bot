@@ -11,43 +11,44 @@ export const executePlaylistImport = async (interaction: ChatInputCommandInterac
 
   var nextPositionInPlaylist = await getNumberOfPlaylistItems(memberId, targetPlaylistName) + 1;
 
-  await db.query(
+  const result = await db.query(
     `SELECT * FROM playlist WHERE playlistName = ? AND userId = ?`,
     [targetPlaylistName, memberId]
-  ).then((result) => {
-    if (result.length === 0) {
-      embed.setTitle('Error')
-        .setDescription(`No playlist with name "${targetPlaylistName}" belonging to ${userMention(memberId)} exists.`)
-        .setTimestamp();
-      return interaction.reply({ content: '', components: [], embeds: [embed] });
-    }
-    playlistItems.forEach(async (playlistItem) => {
-      await db.query(
-        `INSERT INTO playlist_items (title, uploader, musicId, originalURL, dateCreated) VALUES (?, ?, ?, ? ,?)`,
-        [playlistItem.musicTitle, playlistItem.uploader, playlistItem.musicId, 
-          playlistItem.originalURL, playlistItem.dateCreated]
-      );
+  );
 
-      await db.query(
-        'SELECT playlistItemId FROM playlist_items WHERE title = ? AND uploader = ? AND musicId = ? AND originalURL = ?',
-        [playlistItem.musicTitle, playlistItem.uploader, playlistItem.musicId, 
-          playlistItem.originalURL]
-      ).then(async (result) => {
-        await db.query(
-          'INSERT INTO playlist_content_map (playlistItemId, userId, playlistName, playlistPosition) VALUES (?, ?, ?, ?)',
-          [result[0].playlistItemId, memberId, targetPlaylistName, nextPositionInPlaylist]
-        );
-        nextPositionInPlaylist++;
-      });
+  if (result.length === 0) {
+    embed.setTitle('Error')
+      .setDescription(`No playlist with name "${targetPlaylistName}" belonging to ${userMention(memberId)} exists.`)
+      .setTimestamp();
+    return interaction.reply({ content: '', components: [], embeds: [embed] });
+  }
 
-      embed.setTitle('Import')
-        .setDescription(
-          `${playlistInfo.itemCount} items from YouTube playlist "${playlistInfo.playlistName}" appended to playlist "${targetPlaylistName}" belonging to ${userMention(memberId)}`
-        )
-        .setTimestamp();
-      return interaction.reply({ content: '', components: [], embeds: [embed] });
-    });
-  })
+  playlistItems.forEach(async (playlistItem) => {
+    await db.query(
+      `INSERT INTO playlist_items (title, uploader, musicId, originalURL, dateCreated) VALUES (?, ?, ?, ? ,?)`,
+      [playlistItem.musicTitle, playlistItem.uploader, playlistItem.musicId, 
+        playlistItem.originalURL, playlistItem.dateCreated]
+    );
+
+    const result = await db.query(
+      'SELECT playlistItemId FROM playlist_items WHERE title = ? AND uploader = ? AND musicId = ? AND originalURL = ?',
+      [playlistItem.musicTitle, playlistItem.uploader, playlistItem.musicId, 
+        playlistItem.originalURL]
+    );
+
+    await db.query(
+      'INSERT INTO playlist_content_map (playlistItemId, userId, playlistName, playlistPosition) VALUES (?, ?, ?, ?)',
+      [result[0].playlistItemId, memberId, targetPlaylistName, nextPositionInPlaylist]
+    );
+    nextPositionInPlaylist++;
+
+    embed.setTitle('Import')
+      .setDescription(
+        `${playlistInfo.itemCount} items from YouTube playlist "${playlistInfo.playlistName}" appended to playlist "${targetPlaylistName}" belonging to ${userMention(memberId)}`
+      )
+      .setTimestamp();
+    return interaction.reply({ content: '', components: [], embeds: [embed] });
+  });
 }
 
 const getNumberOfPlaylistItems = async (memberId: string, playlistName: string): Promise<number> => {
