@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, CacheType, EmbedBuilder, userMention } from "discord.js";
+import { ChatInputCommandInteraction, CacheType, EmbedBuilder, userMention, ApplicationCommandOptionWithChoicesAndAutocompleteMixin } from "discord.js";
 import * as db from '../../utils/database';
 
 export const executePlaylistRename = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
@@ -6,35 +6,48 @@ export const executePlaylistRename = async (interaction: ChatInputCommandInterac
   const playlistName = interaction.options.get('name').value as string;
   const newPlaylistName = interaction.options.get('newname').value as string;
 
-  const result = await db.query(
-    `SELECT * FROM playlist WHERE playlistName = ? AND userId = ?`, 
-    [playlistName, memberId]
-  );
+  try {
+    await db.query('START TRANSACTION');
+    const result = await db.query(
+      `SELECT * FROM playlist WHERE playlistName = ? AND userId = ?`, 
+      [playlistName, memberId]
+    );
+  
+    if (result.length === 0) {
+      embed.setTitle('Error')
+        .setDescription(`No such playlist with name "${playlistName}" belonging to ${userMention(memberId)} exists`);
+      return interaction.reply({ content: '', components: [], embeds: [embed] });
+    }
+  
+    await db.query(
+      'INSERT INTO playlist (playlistName, userId) VALUES (?, ?)', 
+      [newPlaylistName, memberId]
+    )
+  
+    await db.query(
+      'UPDATE playlist_content_map SET playlistName = ? WHERE playlistName = ? AND userId = ?', 
+      [newPlaylistName, playlistName, memberId]
+    );
+  
+    await db.query(
+      `DELETE FROM playlist WHERE playlistName = ?`,
+      [playlistName]
+    );
 
-  if (result.length === 0) {
+    await db.query('COMMIT');
+
+    embed.setTitle('Playlist')
+      .setDescription(
+        `Successfully renamed playlist "${playlistName}" belonging to ${userMention(memberId)} to "${newPlaylistName}"`
+      )
+      .setTimestamp();
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error(`Transaction failed: ${error}`);
     embed.setTitle('Error')
-      .setDescription(`No such playlist with name "${playlistName}" belonging to ${userMention(memberId)} exists`);
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
+      .setDescription('An error occurred while renaming the playlist')
+      .setTimestamp();
   }
 
-  db.query(
-    'INSERT INTO playlist (playlistName, userId) VALUES (?, ?)', 
-    [newPlaylistName, memberId]
-  )
-    
-  db.query(
-    'UPDATE playlist_content_map SET playlistName = ? WHERE playlistName = ? AND userId = ?', 
-    [newPlaylistName, playlistName, memberId]
-  );
-
-  db.query(
-    `DELETE FROM playlist WHERE playlistName = ?`,
-    [playlistName]
-  );
-
-  embed.setTitle('Playlist')
-    .setDescription(
-      `Successfully renamed playlist "${playlistName}" belonging to ${userMention(memberId)} to "${newPlaylistName}"`
-    );
   return interaction.reply({ content: '', components: [], embeds: [embed] });
 }
