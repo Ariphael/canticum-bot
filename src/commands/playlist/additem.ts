@@ -20,26 +20,38 @@ export const executePlaylistAddItem = async (interaction: ChatInputCommandIntera
   if (result.length === 0) {
     embed.setTitle('Error')
       .setDescription(
-      `Playlist with name "${playlistName}" belonging to ${userMention(memberId)} does not exists`
+      `No playlist with name "${playlistName}" belonging to ${userMention(memberId)} exists`
     )
       .setTimestamp();
     return interaction.reply({ content: '', components: [], embeds: [embed] });        
   }
-  const playlistItem = await createPlaylistItem(query);
-  await insertPlaylistItemIntoDBIfUnique(playlistItem);
-  addItemToUserPlaylist(memberId, playlistName, playlistItem, positionInPlaylist);
-  embed.setTitle('Playlist')
-    .setDescription(
-      `Added "${playlistItem.musicTitle}" to playlist "${playlistName}" owned by user ${userMention(memberId)}`
-    )
-    .setTimestamp();
+
+  try {
+    await db.query('START TRANSACTION');
+    const playlistItem = await createPlaylistItem(query);
+    await insertPlaylistItemIntoDBIfUnique(playlistItem);
+    addItemToUserPlaylist(memberId, playlistName, playlistItem, positionInPlaylist);
+    embed.setTitle('Playlist')
+      .setDescription(
+        `Added "${playlistItem.musicTitle}" to playlist "${playlistName}" owned by user ${userMention(memberId)}`
+      )
+      .setTimestamp();
+    await db.query('COMMIT');
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error(`Transaction error: ${error}`);
+    embed.setTitle('Error')
+      .setDescription('An error occurred while adding an item to the playlist')
+      .setTimestamp();
+    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true })
+  }
 
   return interaction.reply({ content: '', components: [], embeds: [embed] });
 }
 
 const addItemToUserPlaylist = async (memberId: string, playlistName: string, playlistItem: PlaylistItem, playlistPosition: number) => {
   if (playlistPosition !== undefined) {
-    db.query(
+    await db.query(
       `UPDATE playlist_content_map SET playlistPosition = playlistPosition + 1 WHERE userId = ? AND playlistName = ? AND playlistPosition >= ?`,
       [memberId, playlistName, playlistPosition]
     );
@@ -50,7 +62,7 @@ const addItemToUserPlaylist = async (memberId: string, playlistName: string, pla
     [playlistItem.musicTitle, playlistItem.uploader, playlistItem.originalURL]
   );
 
-  db.query(
+  await db.query(
     `INSERT INTO playlist_content_map (playlistItemId, userId, playlistName, playlistPosition) VALUES (?, ?, ?, ?)`,
     [result[0].playlistItemId, memberId, playlistName, playlistPosition]
   );
@@ -71,7 +83,7 @@ const insertPlaylistItemIntoDBIfUnique = async (playlistItem: PlaylistItem) => {
   );
 
   if (result.length === 0) {
-    db.query(
+    await db.query(
       `INSERT INTO playlist_items (title, uploader, musicId, originalURL, dateCreated) VALUES (?, ?, ?, ?, ?)`,
       [playlistItem.musicTitle, playlistItem.uploader, playlistItem.musicId, playlistItem.originalURL, 
       playlistItem.dateCreated]
