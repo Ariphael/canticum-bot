@@ -47,6 +47,7 @@ export const executePlaylistRename = async (interaction: ChatInputCommandInterac
     embed.setTitle('Error')
       .setDescription('An error occurred while renaming the playlist')
       .setTimestamp();
+    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
   }
 
   return interaction.reply({ content: '', components: [], embeds: [embed] });
