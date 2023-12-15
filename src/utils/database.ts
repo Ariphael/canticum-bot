@@ -17,7 +17,7 @@ export const init = () => connection.connect((connectError) => {
   }
 });
 
-export const query = (sqlInput: string, args: Array<string | number>): Promise<RowDataPacket[]> => {
+export const query = (sqlInput: string, args: Array<string | number> = []): Promise<RowDataPacket[]> => {
   return new Promise<RowDataPacket[]>((success, reject) => {
     connection.query(sqlInput, args, (queryError, result) => {
       if (queryError) {
