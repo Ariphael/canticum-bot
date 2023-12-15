@@ -1,11 +1,12 @@
 {
-    "compilerOptions": {
-        "esModuleInterop": true,
-        "noImplicitAny": false,
-        "noEmit": true,
-        "resolveJsonModule": true,
-    },
-    "exclude": [
-      "**/**_broken.ts",
-    ]
+  "compilerOptions": {
+      "esModuleInterop": true,
+      "outDir": "./prod",
+      "noImplicitAny": false,
+      "noEmit": false,
+      "resolveJsonModule": true,
+  },
+  "exclude": [
+    "**/**_broken.ts",
+  ]
 }
