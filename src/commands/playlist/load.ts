@@ -8,28 +8,42 @@ export const executePlaylistLoadToQueue = async (interaction: ChatInputCommandIn
   const playlistName = interaction.options.get('name').value as string;
   const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
 
-  const queryResult = await db.query(
-    'SELECT * FROM playlist WHERE userId = ? AND playlistName = ?',
-    [memberId, playlistName]
-  );
+  try {
+    const queryResult = await db.query(
+      'SELECT * FROM playlist WHERE userId = ? AND playlistName = ?',
+      [memberId, playlistName]
+    );
 
-  if (queryResult.length === 0) {
+    if (queryResult.length === 0) {
+      embed.setTitle('Error')
+        .setDescription(`No playlist with name "${playlistName}" belonging to ${userMention(memberId)} exists.`)
+        .setTimestamp();
+      return interaction.reply({ content: '', components: [], embeds: [embed] });
+    }
+
+    const musicQueueOldLength = musicQueue.getLength();
+
+    if (await loadPlaylistToQueue(embed, memberId, playlistName)) {
+      if (musicQueueOldLength === 0 && !musicPlayerInstance.isPlayingAudio())
+        musicPlayerInstance.playAudio();
+
+      embed.setTitle('Playlist')
+        .setDescription(`Content of playlist "${playlistName}" successfully appended to queue.`)
+        .setTimestamp();
+    }
+
+    return interaction.reply({ content: '', components: [], embeds: [embed] })
+  } catch (error) {
+    console.error(`Playlist load to queue error: ${error}`);
     embed.setTitle('Error')
-      .setDescription(`No playlist with name "${playlistName}" belonging to ${userMention(memberId)} exists.`)
+      .setDescription('An error occurred while loading the playlist to queue')
       .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
+    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
   }
-
-  const musicQueueOldLength = musicQueue.getLength();
-  loadPlaylistToQueue(interaction, embed, memberId, playlistName).then(_ => {
-    if (musicQueueOldLength === 0 && !musicPlayerInstance.isPlayingAudio())
-      musicPlayerInstance.playAudio();
-  });
 }
 
 const loadPlaylistToQueue = async (
-  interaction: ChatInputCommandInteraction<CacheType>, 
-  embed: EmbedBuilder, 
+  embed: EmbedBuilder,
   memberId: string, 
   playlistName: string
 ) => {
@@ -41,7 +55,7 @@ const loadPlaylistToQueue = async (
     embed.setTitle('Error')
       .setDescription(`Playlist "${playlistName}" has no content to append to the queue`)
       .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
+    return false;
   }
   result.forEach((playlistItem) => {
     musicQueue.enqueue({
@@ -51,10 +65,5 @@ const loadPlaylistToQueue = async (
       originalURL: playlistItem.originalURL,
     });
   });
-  embed.setTitle('Playlist')
-    .setDescription(
-      `Content of playlist "${playlistName}" has been appended to the queue. Use /queue to see current state of queue.`
-    )
-    .setTimestamp();
-  return await interaction.reply({ content: '', components: [], embeds: [embed] });
+  return true;
 }
