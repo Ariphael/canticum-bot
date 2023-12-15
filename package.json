@@ -32,9 +32,11 @@
     "dotenv": "^16.0.3",
     "libsodium-wrappers": "^0.7.10",
     "mysql": "^2.18.1",
+    "mysql2": "^3.6.1",
     "node-cron": "^3.0.2",
     "sqlite3": "^5.1.6",
     "tinyduration": "^3.2.4",
+    "url": "^0.11.3",
     "ytdl-core": "^4.11.3"
   },
   "devDependencies": {
