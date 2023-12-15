@@ -76,7 +76,7 @@ export const playlist: Command = {
     }, {
       type: ApplicationCommandOptionType.Integer, 
       name: 'position',
-      description: 'position in playlist to replace',
+      description: 'position in playlist to insert',
       required: false,
     }]
   }, {
