@@ -7,17 +7,25 @@ export const executePlaylistInfo = async (interaction: ChatInputCommandInteracti
   const memberId = interaction.member.user.id;
   const playlistName = interaction.options.get('name').value as string;
 
-  const result = await db.query(
-    `SELECT * FROM playlist WHERE userId = ? AND playlistName = ?`,
-    [memberId, playlistName]
-  );
+  try {
+    const result = await db.query(
+      `SELECT * FROM playlist WHERE userId = ? AND playlistName = ?`,
+      [memberId, playlistName]
+    );
 
-  if (result.length === 0) {
+    if (result.length === 0) {
+      embed.setTitle('Error')
+        .setDescription(`No playlist with name "${playlistName}" was found`);
+      return interaction.reply({ content: '', components: [], embeds: [embed] });
+    }
+    await doExecutePlaylistInfo(interaction, embed, memberId, playlistName);
+  } catch (error) {
+    console.error(`Transaction error: ${error}`);
     embed.setTitle('Error')
-      .setDescription(`No playlist with name "${playlistName}" was found`);
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
+      .setDescription('An error occurred while fetching playlist content.')
+      .setTimestamp();
+    await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
   }
-  await doExecutePlaylistInfo(interaction, embed, memberId, playlistName);
 }
 
 const doExecutePlaylistInfo = async (
