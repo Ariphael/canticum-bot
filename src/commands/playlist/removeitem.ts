@@ -6,40 +6,52 @@ export const executePlaylistRemoveItem = async (interaction: ChatInputCommandInt
   const playlistName = interaction.options.get('name').value as string;
   const positionInPlaylist = interaction.options.get('position').value as number;
 
-  const result = await db.query(
-    `SELECT * FROM playlist WHERE playlistName = ? AND userId = ?`,
-    [playlistName, memberId]
-  );
+  await db.query('START TRANSACTION');
 
-  if (result.length === 0) {
-    embed.setTitle('Error')
-    .setDescription(`No playlist with name "${playlistName}" belonging to ${userMention(memberId)} was found.`)
-    .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });     
-  }
+  try {
+    const result = await db.query(
+      `SELECT * FROM playlist WHERE playlistName = ? AND userId = ?`,
+      [playlistName, memberId]
+    );
 
-  const numberOfPlaylistItemsQueryResult = await db.query(
-    `SELECT COUNT(*) AS itemCount FROM playlist_content_map WHERE userId = ? AND playlistName = ?`,
-    [memberId, playlistName]);
-  const numberOfPlaylistItems = numberOfPlaylistItemsQueryResult[0].itemCount as number;
+    if (result.length === 0) {
+      embed.setTitle('Error')
+        .setDescription(`No playlist with name "${playlistName}" belonging to ${userMention(memberId)} was found.`)
+        .setTimestamp();
+      return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });     
+    }
 
-  if (numberOfPlaylistItems < positionInPlaylist) {
-    embed.setTitle('Error')
-      .setDescription(`Position value too large`)
+    const numberOfPlaylistItemsQueryResult = await db.query(
+      `SELECT COUNT(*) AS itemCount FROM playlist_content_map WHERE userId = ? AND playlistName = ?`,
+      [memberId, playlistName]);
+    const numberOfPlaylistItems = numberOfPlaylistItemsQueryResult[0].itemCount as number;
+
+    if (numberOfPlaylistItems < positionInPlaylist) {
+      embed.setTitle('Error')
+        .setDescription(`Position value too large`)
+        .setTimestamp();
+      return await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
+    } else if (numberOfPlaylistItems < positionInPlaylist || positionInPlaylist < 1) {
+      embed.setTitle('Error')
+        .setDescription('Invalid position value.')
+        .setTimestamp();
+      return await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
+    }
+
+    const playlistItemTitle = await removeItemAndUpdatePositionsInDB(memberId, playlistName, positionInPlaylist);
+    await db.query('COMMIT');
+    embed.setTitle('Playlist')
+      .setDescription(`Removed ${playlistItemTitle} from position ${positionInPlaylist} of playlist ${playlistName}`)
       .setTimestamp();
-    return await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
-  } else if (numberOfPlaylistItems < positionInPlaylist || positionInPlaylist < 1) {
+    return interaction.reply({ content: '', components: [], embeds: [embed] });
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error(`Playlist removeitem transaction error: ${error}`)
     embed.setTitle('Error')
-      .setDescription('Invalid position value.')
+      .setDescription('An error occurred while removing an item in playlist.')
       .setTimestamp();
-    return await interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
+    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
   }
-
-  const playlistItemTitle = await removeItemAndUpdatePositionsInDB(memberId, playlistName, positionInPlaylist);
-  embed.setTitle('Playlist')
-    .setDescription(`Removed ${playlistItemTitle} from position ${positionInPlaylist} of playlist ${playlistName}`)
-    .setTimestamp();
-  return interaction.reply({ content: '', components: [], embeds: [embed] });
 }
 
 const removeItemAndUpdatePositionsInDB = async (memberId: string, playlistName: string, positionInPlaylist: number) => {
@@ -48,12 +60,12 @@ const removeItemAndUpdatePositionsInDB = async (memberId: string, playlistName: 
     [memberId, playlistName, positionInPlaylist]
   );
 
-  db.query(
+  await db.query(
     `DELETE FROM playlist_content_map WHERE userId = ? AND playlistName = ? AND playlistPosition = ?`,
     [memberId, playlistName, positionInPlaylist]
   );
 
-  db.query(
+  await db.query(
     `UPDATE playlist_content_map SET playlistPosition = playlistPosition - 1 WHERE userId = ? AND playlistName = ? AND playlistPosition > ?`,
     [memberId, playlistName, positionInPlaylist]
   );
