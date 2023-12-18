@@ -15,7 +15,7 @@ const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
 
 export const play: Command = {
   name: 'play',
-  description: 'plays or enqueues song',
+  description: 'commences playback or enqueues song',
   options: [{
     type: ApplicationCommandOptionType.String,
     name: 'query',
@@ -48,7 +48,7 @@ const executePlay = async (_client: Client, interaction: ChatInputCommandInterac
         ? 'Playback is paused. Use /unpause instead.' 
         : 'Music player is currently playing audio')
       .setTimestamp();
-    return interaction.reply({ content: '', components: [], embeds: [embed] });
+    return interaction.reply({ content: '', components: [], embeds: [embed], ephemeral: true });
   }
 
   if (voiceConnection === undefined) {
