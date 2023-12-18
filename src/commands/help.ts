@@ -1,5 +1,5 @@
 import { Command } from '../interfaces/command-interface';
-import { embeds, getCommandEmbed } from '../embeds/helpEmbeds';
+import { mainHelpEmbed, getCommandEmbed } from '../embeds/helpEmbeds';
 // import { helpButtons } from '../buttons/help.buttons';
 import { 
   ApplicationCommandOptionType, 
@@ -16,7 +16,7 @@ export const help: Command = {
   options: [{
     type: ApplicationCommandOptionType.String,
     name: 'command',
-    description: 'displays abstract of specific commands', 
+    description: 'displays detailed info about specific commands', 
     required: false,
   }],
   run: async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
@@ -31,11 +31,8 @@ const executeHelp = async (_client: Client, interaction: ChatInputCommandInterac
     const commandEmbed: EmbedBuilder = getCommandEmbed(commandOption);
     await interaction.reply({ content: '', components: [], embeds: [commandEmbed]});
     return;
-  } 
-
-  // TODO refactor buttons
-  // helpButtons.handleInteraction(interaction.channel);
+  }
 
   // await interaction.reply({ content: '', components: [helpButtons.row], embeds: [embeds[0]] });
-  await interaction.reply({ content: '', components: [], embeds: [embeds[0]] });
+  await interaction.reply({ content: '', components: [], embeds: [mainHelpEmbed] });
 };
