@@ -18,7 +18,6 @@ export const disconnect: Command = {
 
 const executeDisconnect = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
   const embed = new EmbedBuilder()
-    .setColor(0x0099FF)
     .setTitle('Disconnect');
   const connection = getVoiceConnection(interaction.guild!.id);
   const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();

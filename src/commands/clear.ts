@@ -13,7 +13,6 @@ export const clear: Command = {
 const executeClear = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   const queueClearSuccessFlag = musicQueue.clear().length === 0;
   const embed = new EmbedBuilder()
-    .setColor(0x0099FF)
     .setTitle('Clear')
     .setDescription(
       queueClearSuccessFlag 

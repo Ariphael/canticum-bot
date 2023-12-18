@@ -16,7 +16,6 @@ export const Ping: Command = {
 
 const executePing = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
   const embed = new EmbedBuilder()
-  .setColor(0x0099FF)
   .setTitle('Pong!');
 
   await interaction.reply({ content: '', components: [], embeds: [embed] });

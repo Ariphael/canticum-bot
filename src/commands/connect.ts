@@ -25,10 +25,9 @@ export const connect: Command = {
     await executeConnect(client, interaction);
   }
 };
- 
+
 const executeConnect = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
   const embed = new EmbedBuilder()
-    .setColor(0x0099FF)
     .setTitle('Connect');
   const connection = getVoiceConnection(interaction.guild!.id);
 
