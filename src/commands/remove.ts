@@ -36,18 +36,18 @@ export const remove: Command = {
   }
 };
 
-const executeRemove = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
+const executeRemove = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
+  const embed = new EmbedBuilder();
   const subcommand = interaction.options.getSubcommand();
 
   if (subcommand === 'item') {
-    await executeRemoveItem(interaction);
+    await executeRemoveItem(interaction, embed);
   } else if (subcommand === 'range') {
-    await executeRemoveRange(interaction);
+    await executeRemoveRange(interaction, embed);
   }
 }
 
-const executeRemoveItem = async (interaction: ChatInputCommandInteraction<CacheType>) => {
-  const embed = new EmbedBuilder();
+const executeRemoveItem = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
   const positionOption = interaction.options.get('position').value as number;
   if (positionOption < 1 || positionOption > musicQueue.getLength()) {
     embed.setTitle('Error')
@@ -71,8 +71,7 @@ const executeRemoveItem = async (interaction: ChatInputCommandInteraction<CacheT
   });
 };
 
-const executeRemoveRange = async (interaction: ChatInputCommandInteraction<CacheType>) => {
-  const embed = new EmbedBuilder();
+const executeRemoveRange = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
   const queueLength = musicQueue.getLength();
   const startPosition = interaction.options.get('start').value as number;
   const endPosition = interaction.options.get('end').value as number;
