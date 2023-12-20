@@ -1,13 +1,14 @@
 import { Command } from '../interfaces/command-interface';
-import { mainHelpEmbed, getCommandEmbed } from '../embeds/helpEmbeds';
-// import { helpButtons } from '../buttons/help.buttons';
+import helpEmbeds from '../commands/static/help_embeds.json';
+import commandInfoData from '../commands/static/bot_commands.json';
 import { 
   ApplicationCommandOptionType, 
   CacheType, 
   ChatInputCommandInteraction, 
   Client, 
   CommandInteractionOptionResolver, 
-  EmbedBuilder
+  EmbedBuilder,
+  EmbedData
 } from 'discord.js';
 
 export const help: Command = {
@@ -27,12 +28,13 @@ export const help: Command = {
 const executeHelp = async (_client: Client, interaction: ChatInputCommandInteraction<CacheType>) => {
   const commandInteractionOption = interaction.options.get('command');
   if (commandInteractionOption) {
-    const commandOption: String = commandInteractionOption.value as String;
-    const commandEmbed: EmbedBuilder = getCommandEmbed(commandOption);
-    await interaction.reply({ content: '', components: [], embeds: [commandEmbed]});
-    return;
+    const commandOption = commandInteractionOption.value as string;
+    const commandEmbed: EmbedBuilder = commandInfoData.hasOwnProperty(commandOption)
+      ? new EmbedBuilder(commandInfoData[commandOption])
+      : new EmbedBuilder(helpEmbeds.unknownCommand);
+    commandEmbed.setTimestamp();
+    return await interaction.reply({ content: '', components: [], embeds: [commandEmbed]});
   }
 
-  // await interaction.reply({ content: '', components: [helpButtons.row], embeds: [embeds[0]] });
-  await interaction.reply({ content: '', components: [], embeds: [mainHelpEmbed] });
+  return await interaction.reply({ content: '', components: [], embeds: [new EmbedBuilder(helpEmbeds.mainHelpEmbed)] });
 };
