@@ -1,0 +1,182 @@
+{
+  "help": {
+    "title": "help (command)",
+    "description": "Displays list of commands or information about specific command. Parameters:",
+    "values": [{
+      "name": "command",
+      "description": "name of command. (Eg. connect, queue, skip, skip to)",
+      "inline": true
+    }]
+  },
+  "clear": {
+    "title": "clear",
+    "description": "Clears queue"
+  },
+  "connect": {
+    "title": "connect [voicechannel]",
+    "description": "Connects/migrates to another voice channel. Does not destroy the underlying audio resource. Parameters:",
+    "fields": [{
+      "name": "voicechannel",
+      "description": "Target guild voice channel",
+      "inline": true
+    }]
+  },
+  "disconnect": {
+    "title": "disconnect",
+    "description": "Disconnect from voice channel and pause underlying audio resource"
+  },
+  "loop": {
+    "title": "loop [subcommand]",
+    "description": "Loops current playing song or through queue. Available subcommands:",
+    "fields": [{
+      "name": "currsong",
+      "value": "loop the current playing song",
+      "inline": true
+    }, {
+      "name": "queue",
+      "value": "loop the queue with dequeuing operation disabled when /skip is used",
+      "inline": true
+    }, {
+      "name": "off",
+      "value": "turns off looping (enables default dequeuing operations)",
+      "inline": true
+    }]
+  },
+  "nowplaying": {
+    "title": "nowplaying",
+    "description": "Display title and url of song currently playing"
+  },
+  "pause": {
+    "title": "pause",
+    "description": "Pause the underlying audio resource"
+  },
+  "ping": {
+    "title": "ping",
+    "description": "Check if bot is alive"
+  },  
+  "play": {
+    "title": "play (query)",
+    "description": "Resolves audio resource issue or enqueues song. Parameters:",
+    "fields": [{
+      "name": "query",
+      "value": "Query can be composed of raw keywords (eg. title of song) or the url of a youtube or spotify video/playlist. If left blank, the play command attempts to commence playback."
+    }]
+  },
+  "playlist": {
+    "title": "playlist [subcommand]",
+    "description": "Manage or enqueue content of personal playlists. Available subcommands:",
+    "fields": [{
+      "name": "import",
+      "value": "import a playlist from youtube",
+      "inline": true
+    }, {
+      "name": "info",
+      "value": "display content of specific playlist",
+      "inline": true
+    }, {
+      "name": "additem",
+      "value": "add an item to personal playlist",
+      "inline": true
+    }, {
+      "name": "removeitem",
+      "value": "remove an item from personal playlist",
+      "inline": true
+    }, {
+      "name": "load",
+      "value": "enqueue content of playlist to queue",
+      "inline": true
+    }, {
+      "name": "view",
+      "value": "show all personal playlists",
+      "inline": true
+    }, {
+      "name": "create",
+      "value": "create a personal playlist",
+      "inline": true
+    }, {
+      "name": "rename",
+      "value": "rename a personal playlist",
+      "inline": true
+    }, {
+      "name": "delete",
+      "value": "delete a personal playlist",
+      "inline": true
+    }]
+  },
+  "queue": {
+    "title": "queue (pagenumber)",
+    "description": "Displays content of queue including the positions of the content. 10 results per page. Parameters:",
+    "fields": [{
+      "name": "pagenumber",
+      "value": "Positive integer representing the page of results to display. If left blank, queue by default shows the first number.",
+      "inline": true
+    }]
+  },
+  "remove": {
+    "title": "remove [subcommand]",
+    "description": "Remove item(s) from the queue. Available subcommands:",
+    "fields": [{
+      "name": "item",
+      "value": "remove a specific item from queue",
+      "inline": true
+    }, {
+      "name": "range",
+      "value": "remove a specific range of items from queue",
+      "inline": true
+    }]
+  },
+  "shuffle": {
+    "title": "shuffle",
+    "value": "Randomises the queue using Fisher-Yates Shuffle algorithm"
+  },
+  "skip": {
+    "title": "skip [subcommand]",
+    "value": "Skips to the next song or a specified position in the queue. Available subcommands:",
+    "fields": [{
+      "name": "to",
+      "value": "Skips to specified position in queue, dequeuing all items in front of the specified position",
+      "inline": true
+    }, {
+      "name": "next",
+      "value": "Skips to next song in queue",
+      "inline": true
+    }]
+  },
+  "swap": {
+    "title": "swap [pos1] [pos2]",
+    "value": "Swaps two items in the queue. Parameters: ",
+    "fields": [{
+      "name": "pos1 (and pos2)",
+      "value": "Positive integer representing a position in the queue"
+    }]
+  },
+  "unpause": {
+    "title": "unpause",
+    "value": "Unpauses playback of audio resource"
+  },
+  "volume": {
+    "title": "volume [vol]",
+    "value": "Sets the volume of the audio resource. Parameters:",
+    "fields": [{
+      "name": "vol",
+      "value": "Number between 0 and 1"
+    }]
+  },
+  "history": {
+    "title": "history [subcommand]",
+    "description": "Displays history of songs played. Available subcommands:",
+    "fields": [{
+      "name": "play",
+      "value": "show history of songs played",
+      "inline": true
+    }, {
+      "name": "queue",
+      "value": "show history of songs enqueued",
+      "inline": true
+    }, {
+      "name": "personal",
+      "value": "show history of songs issuer of command enqueued",
+      "inline": true
+    }]
+  }
+}

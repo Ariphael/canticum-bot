@@ -1,4 +1,6 @@
-import { doHandleReady } from '../listeners/ready';
+import { Collection } from 'discord.js';
+import { addReadyEventToClient } from '../events/ready';
+import { Command } from '../interfaces/command-interface';
 import { 
   getClientApplicationNullMock, 
   getClientMock, 
@@ -18,38 +20,45 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('ready listener fail cases', () => {
-  test('returns if client.user is null (doHandleReady directly called)', async () => {
-    const logSpy = jest.spyOn(console, 'log');
-    await doHandleReady(clientUserNull);
-    expect(logSpy).not.toHaveBeenCalled();
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+describe('ready listener', () => {
+  test('does not set commands if there exists no logged in client user', async () => {
+    const clientOnSpy = jest.spyOn(clientUserNull, 'once');
+    const commandCollection = new Collection<string, Command>();
+    addReadyEventToClient(clientUserNull, commandCollection);
+    const callback = clientOnSpy.mock.calls[0][1];
+    await callback();
     expect(clientUserNull.application.commands.set).not.toHaveBeenCalled();
   });
 
-  test('returns if client.application is null (doHandleReady directly called)', async () => {
-    const logSpy = jest.spyOn(console, 'log');
-    await doHandleReady(clientApplicationNull);
-    expect(logSpy).not.toHaveBeenCalled();
+  test('does not set commands if application of bot is null', async () => {
+    const clientOnSpy = jest.spyOn(clientApplicationNull, 'once');
+    const commandCollection = new Collection<string, Command>();
+    addReadyEventToClient(clientApplicationNull, commandCollection);
+    const callback = clientOnSpy.mock.calls[0][1];
+    // client.application is null so line12 of src/events/ready.ts should never be reached
+    const callbackReturnVal = await callback();
+    expect(callbackReturnVal).toBeUndefined();
   });
 
-  test('returns if client.user and client.application is null (doHandleReady directly called)', async () => {
-    const logSpy = jest.spyOn(console, 'log');
-    await doHandleReady(clientUserApplicationNull);
-    expect(logSpy).not.toHaveBeenCalled();
-  });
-});
-
-describe('ready listener success cases', () => {
-  test('calls client.application.commands.set correctly (doHandleReady directly called)', async () => {
-    await doHandleReady(client);
-    expect(client.application.commands.set).toHaveBeenCalledTimes(1); 
-    expect(client.application.commands.set).toHaveReturned();
+  test('does not set commands if client.application and client.user is null', async () => {
+    const clientOnSpy = jest.spyOn(clientUserApplicationNull, 'once');
+    const commandCollection = new Collection<string, Command>();
+    addReadyEventToClient(clientUserApplicationNull, commandCollection);
+    const callback = clientOnSpy.mock.calls[0][1];
+    const callbackReturnVal = await callback();
+    expect(callbackReturnVal).toBeUndefined();
   });
 
-  test('console logs client.user.tag after client.application.commands.set (doHandleReady directly called)', async () => {
-    const logSpy = jest.spyOn(console, 'log');
-    await doHandleReady(client);
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(`${client.user.tag}`));
+  test('sets commands if application of bot and a logged in client user exists', async () => {
+    const clientOnSpy = jest.spyOn(client, 'once');
+    const commandCollection = new Collection<string, Command>();
+    addReadyEventToClient(client, commandCollection);
+    const callback = clientOnSpy.mock.calls[0][1];
+    await callback();
+    expect(client.application.commands.set).toHaveBeenCalled();    
   });
 });

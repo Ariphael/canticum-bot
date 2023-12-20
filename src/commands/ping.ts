@@ -1,6 +1,4 @@
-import { Command } from './command-interface';
-import { buttons } from '../buttons/buttons';
-import { pingOkButtonId } from '../buttons/buttonIdData.json';
+import { Command } from '../interfaces/command-interface';
 import { 
   CacheType, 
   ChatInputCommandInteraction, 
@@ -16,22 +14,9 @@ export const Ping: Command = {
   }
 };
 
-export const executePing = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
-  const button = buttons.find(b => b.buttonId === pingOkButtonId);
-  const row = button.row;
-  
-  button.handleInteraction(interaction.channel);
-
+const executePing = async (client: Client, interaction: ChatInputCommandInteraction<CacheType>): Promise<void> => {
   const embed = new EmbedBuilder()
-  .setColor(0x0099FF)
-  .setTitle('Pong!');
+    .setTitle('Pong!');
 
-  const msg = await interaction.deferReply();
-  const botLatency = msg.interaction.createdTimestamp - interaction.createdTimestamp;
-  const apiLatency = client.ws.ping;
-  embed.setDescription(
-    `Bot latency: ${botLatency}ms\nAPI latency: ${apiLatency}ms`
-  );
-
-  await interaction.editReply({ content: '', components: [row], embeds: [embed] });
+  await interaction.reply({ content: '', components: [], embeds: [embed] });
 };

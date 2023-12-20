@@ -1,6 +1,5 @@
 import { Client } from "discord.js";
 
-
 export const getClientMock = () => 
   (({
     user: {
@@ -10,7 +9,8 @@ export const getClientMock = () =>
       commands: {
         set: jest.fn(),
       }
-    }
+    },
+    once: jest.fn(),
   } as unknown) as Client);
 
 export const getClientUserNullMock = () => 
@@ -20,7 +20,8 @@ export const getClientUserNullMock = () =>
       commands: {
         set: jest.fn(),
       }
-    }
+    },
+    once: jest.fn(),
   } as unknown) as Client);
 
 export const getClientApplicationNullMock = () =>
@@ -29,12 +30,14 @@ export const getClientApplicationNullMock = () =>
       tag: String,
     }, 
     application: null,
+    once: jest.fn(),
   } as unknown) as Client)
 
 export const getClientUserApplicationNullMock = () =>
   (({
     user: null, 
     application: null,
+    once: jest.fn(),
   } as unknown) as Client);
 
 

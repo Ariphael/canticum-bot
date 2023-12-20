@@ -14,12 +14,10 @@ type interactionCollectorType =
 export const getInteractionMock = 
   (
     interactionResponse: InteractionResponse<boolean>, 
-    messageBoolean: Message<boolean>, 
     interactionCollector: interactionCollectorType
   ) => (
     ({
-      deferReply: jest.fn(() => { return interactionResponse; }),
-      editReply: jest.fn(() => { return messageBoolean; }),
+      reply: jest.fn(() => { return interactionResponse; }),
       channel: {
         createMessageComponentCollector: jest.fn(() => { return interactionCollector; }),
       },
