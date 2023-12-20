@@ -1,0 +1,108 @@
+{
+  "mainHelpEmbed": {
+    "title": "help",
+    "author": {
+      "name": "canticum"
+    },
+    "description": "List of commands. Usage: /help",
+    "fields": [
+      {
+        "name": "help (command)",
+        "value": "Displays this page/information about specific command",
+        "inline": true
+      },
+      {
+        "name": "ping",
+        "value": "Check if bot is alive",
+        "inline": true
+      },
+      {
+        "name": "connect [target]",
+        "value": "Connects to target voice channel",
+        "inline": true
+      },
+      {
+        "name": "disconnect",
+        "value": "Disconnects from voice channel",
+        "inline": true
+      },
+      {
+        "name": "queue",
+        "value": "Displays the queue",
+        "inline": true
+      },
+      {
+        "name": "play (link/query)",
+        "value": "Commences playback or appends music to queue",
+        "inline": true
+      },
+      {
+        "name": "clear",
+        "value": "Clears queue",
+        "inline": true
+      },
+      {
+        "name": "loop",
+        "value": "Toggles looping for currently playing song/queue",
+        "inline": true
+      },
+      {
+        "name": "nowplaying",
+        "value": "Display song currently playing",
+        "inline": true
+      },
+      {
+        "name": "pause",
+        "value": "Pause audio",
+        "inline": true
+      },
+      {
+        "name": "unpause",
+        "value": "Unpause audio",
+        "inline": true
+      },
+      {
+        "name": "playlist",
+        "value": "Manage/enqueue personal playlists",
+        "inline": true
+      },
+      {
+        "name": "remove",
+        "value": "Remove item(s) from queue",
+        "inline": true
+      },
+      {
+        "name": "shuffle",
+        "value": "Shuffle items in queue",
+        "inline": true
+      },
+      {
+        "name": "skip",
+        "value": "Skip currently playing song",
+        "inline": true
+      },
+      {
+        "name": "swap",
+        "value": "Swap 2 items in queue",
+        "inline": true
+      },
+      {
+        "name": "volume",
+        "value": "Adjust volume of player",
+        "inline": true
+      },
+      {
+        "name": "history",
+        "value": "Displays history of songs played",
+        "inline": true
+      }
+    ]
+  },
+  "unknownCommand": {
+    "title": "help",
+    "author": {
+      "name": "canticum"
+    },
+    "description": "Unknown command. Please use /help to see list of valid commands."
+  }
+}
