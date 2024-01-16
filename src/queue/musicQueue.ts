@@ -1,9 +1,13 @@
 import { MusicQueueItemType } from "../types/musicQueueItem";
+import * as db from "../utils/database";
 
 const queue: MusicQueueItemType[] = [];
 
 export const musicQueue = {
-  enqueue: (musicQueueItem: MusicQueueItemType): number => {
+  enqueue: async (musicQueueItem: MusicQueueItemType, memberId: string): Promise<number> => {
+    await db.query(
+      `INSERT INTO enqueueHistory (title, uploader, originalURL, userId, enqueueTimestamp) VALUES (?, ?, ?, ?, ?)`,
+      [musicQueueItem.musicTitle, musicQueueItem.uploader, musicQueueItem.originalURL, memberId, 'NOW()']);
     return queue.push(musicQueueItem);
   },
   dequeue: (): MusicQueueItemType | undefined => {
