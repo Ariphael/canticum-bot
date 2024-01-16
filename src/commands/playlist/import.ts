@@ -60,6 +60,7 @@ export const executePlaylistImport = async (interaction: ChatInputCommandInterac
     await db.query('COMMIT');
     return await interaction.reply({ content: '', components: [], embeds: [embed] });
   } catch (error) {
+    await db.query('ROLLBACK');
     console.error(`Transaction error: ${error}`);
     embed.setTitle('Error')
       .setDescription('An error occurred while importing a playlist.')
