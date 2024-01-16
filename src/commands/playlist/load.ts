@@ -63,7 +63,7 @@ const loadPlaylistToQueue = async (
       musicId: playlistItem.musicId,
       uploader: playlistItem.uploader,
       originalURL: playlistItem.originalURL,
-    });
+    }, memberId);
   });
   return true;
 }
