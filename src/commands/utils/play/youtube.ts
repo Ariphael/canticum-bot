@@ -1,3 +1,4 @@
+import * as db from '../../../utils/database';
 import axios, { AxiosResponse } from "axios";
 import { musicQueue } from "../../../queue/musicQueue";
 import { EmbedBuilder } from "discord.js";
@@ -10,7 +11,7 @@ const invalidYouTubeVideoURLErrorStr =
 const playlistForbiddenErrorStr = 'Playlist identified forbids access';
 const apiErrorStr = 'YouTube API error';
 
-export const enqueueYouTubePlaylistRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
+export const enqueueYouTubePlaylistRequest = async (url: string, embed: EmbedBuilder, memberId: string): Promise<EmbedBuilder> => {
   const playlistId = new URL(url).searchParams.get('list');
   var playlistItems: AxiosResponse<any, any>;
 
@@ -31,7 +32,7 @@ export const enqueueYouTubePlaylistRequest = async (url: string, embed: EmbedBui
   }
 
   while (playlistItems !== undefined) {
-    enqueuePlaylistItems(playlistItems, playlistId);
+    enqueuePlaylistItems(playlistItems, playlistId, memberId);
     const nextPageToken = playlistItems.data.nextPageToken;
     playlistItems = nextPageToken !== undefined ? await axios.get(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&pageToken=${nextPageToken}&playlistId=${playlistId}&key=${process.env.YOUTUBE_API_KEY}`
@@ -60,7 +61,7 @@ export const enqueueYouTubePlaylistRequest = async (url: string, embed: EmbedBui
   }
 }
 
-export const enqueueYouTubeSongRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
+export const enqueueYouTubeSongRequest = async (url: string, embed: EmbedBuilder, memberId: string): Promise<EmbedBuilder> => {
   const musicId = new URL(url).searchParams.get('v');
 
   try {
@@ -73,7 +74,7 @@ export const enqueueYouTubeSongRequest = async (url: string, embed: EmbedBuilder
       musicId: musicId,
       uploader: videoInfo.items[0].snippet.channelTitle,
       originalURL: url,      
-    });
+    }, memberId);
 
     embed.setTitle(musicQueue.getLength() > 1 ? 'Added to Queue' : 'Now Playing')
       .setDescription(videoInfo.items[0].snippet.title)
@@ -90,14 +91,14 @@ export const enqueueYouTubeSongRequest = async (url: string, embed: EmbedBuilder
   return embed;
 }
 
-const enqueuePlaylistItems = (playlistItems: AxiosResponse<any, any>, playlistId: string) => {
-  playlistItems.data.items.forEach(playlistItem => {
+const enqueuePlaylistItems = (playlistItems: AxiosResponse<any, any>, playlistId: string, memberId: string) => {
+  playlistItems.data.items.forEach(async playlistItem => {
     const musicId = playlistItem.snippet.resourceId.videoId;
     musicQueue.enqueue({
       musicTitle: playlistItem.snippet.title,
       musicId: musicId,
       uploader: playlistItem.snippet.channelTitle,
       originalURL: `https://www.youtube.com/watch?v=${musicId}&list=${playlistId}`
-    });
+    }, memberId);
   });
 }

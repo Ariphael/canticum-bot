@@ -8,7 +8,7 @@ const emptySpotifyAlbumErrorStr = 'Spotify album is empty';
 const spotifyApiErrorStr = 'Spotify API did not respond';
 const maxNoAttemptsItemFetch = 2;
 
-export const enqueueSpotifyPlaylistRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
+export const enqueueSpotifyPlaylistRequest = async (url: string, embed: EmbedBuilder, memberId: string): Promise<EmbedBuilder> => {
   const pathname = new URL(url).pathname;
   const playlistId = pathname.slice(pathname.lastIndexOf('/') + 1);
 
@@ -23,7 +23,7 @@ export const enqueueSpotifyPlaylistRequest = async (url: string, embed: EmbedBui
       .then(async (spotifyPlaylistInfo) => {
         if (spotifyPlaylistInfo.data.tracks.total === 0) 
           throw new Error(emptySpotifyPlaylistErrorStr);
-        await enqueueSpotifyPlaylistItems(playlistId);
+        await enqueueSpotifyPlaylistItems(playlistId, memberId);
         embed
           .setTitle(`${spotifyPlaylistInfo.data.name}`)
           .setDescription(`Enqueued ${spotifyPlaylistInfo.data.tracks.total} songs to the queue`)
@@ -39,7 +39,7 @@ export const enqueueSpotifyPlaylistRequest = async (url: string, embed: EmbedBui
   return embed;
 }
 
-export const enqueueSpotifyAlbumRequest = async (url: string, embed: EmbedBuilder) => {
+export const enqueueSpotifyAlbumRequest = async (url: string, embed: EmbedBuilder, memberId: string) => {
   const pathname = new URL(url).pathname;
   const albumId = pathname.slice(pathname.lastIndexOf('/') + 1);
 
@@ -54,7 +54,7 @@ export const enqueueSpotifyAlbumRequest = async (url: string, embed: EmbedBuilde
       .then(async (spotifyAlbumInfo) => {
         if (spotifyAlbumInfo.data.tracks.total === 0)
           throw new Error(emptySpotifyAlbumErrorStr);
-        await enqueueSpotifyAlbumItems(spotifyAlbumInfo.data.id);
+        await enqueueSpotifyAlbumItems(spotifyAlbumInfo.data.id, memberId);
         embed
           .setTitle(`${spotifyAlbumInfo.data.name}`)
           .setDescription(`Enqueued ${spotifyAlbumInfo.data.tracks.total} songs to the queue`)
@@ -69,7 +69,7 @@ export const enqueueSpotifyAlbumRequest = async (url: string, embed: EmbedBuilde
   return embed;
 }
 
-export const enqueueSpotifyTrackRequest = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
+export const enqueueSpotifyTrackRequest = async (url: string, embed: EmbedBuilder, memberId: string): Promise<EmbedBuilder> => {
   const pathname = new URL(url).pathname;
   const trackId = pathname.slice(pathname.lastIndexOf('/') + 1);
 
@@ -96,7 +96,7 @@ export const enqueueSpotifyTrackRequest = async (url: string, embed: EmbedBuilde
     musicId: youtubeVideoInfo.data.items[0].id.videoId,
     uploader: spotifyTrackInfo.data.album.artists[0].name,
     originalURL: url,
-  });
+  }, memberId);
 
   return embed
     .setTitle(musicQueue.getLength() > 1 ? 'Added to Queue' : 'Now Playing')
@@ -107,7 +107,7 @@ export const enqueueSpotifyTrackRequest = async (url: string, embed: EmbedBuilde
     .setTimestamp();
 }
 
-const enqueueSpotifyPlaylistItems = async (playlistId: string) => {
+const enqueueSpotifyPlaylistItems = async (playlistId: string, memberId: string) => {
   try {
     var playlistItems = await axios.get(
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
@@ -124,7 +124,7 @@ const enqueueSpotifyPlaylistItems = async (playlistId: string) => {
 
   do {
     playlistItems.data.items.forEach(async (playlistItem) => {
-      await enqueueSpotifyPlaylistItem(playlistItem);
+      await enqueueSpotifyPlaylistItem(playlistItem, memberId);
     });
     playlistItems = playlistItems.data.next === null 
       ? undefined
@@ -143,11 +143,11 @@ const enqueueSpotifyPlaylistItems = async (playlistId: string) => {
   } while (playlistItems !== undefined);
 }
 
-const enqueueSpotifyPlaylistItem = async (playlistItem) => {
-  await doEnqueueSpotifyPlaylistItem(playlistItem, 0);
+const enqueueSpotifyPlaylistItem = async (playlistItem, memberId: string) => {
+  await doEnqueueSpotifyPlaylistItem(playlistItem, memberId, 0);
 }
 
-const doEnqueueSpotifyPlaylistItem = async (playlistItem, attempt: number) => {
+const doEnqueueSpotifyPlaylistItem = async (playlistItem, memberId: string, attempt: number) => {
   try {
     // this is EXPENSIVE...
     await axios
@@ -160,18 +160,18 @@ const doEnqueueSpotifyPlaylistItem = async (playlistItem, attempt: number) => {
           musicId: youtubeApiResponse.data.items[0].id.videoId,
           uploader: playlistItem.track.artists[0].name,
           originalURL: playlistItem.track.external_urls.spotify,
-        });
+        }, memberId);
       });
   } catch (error) {
     if (attempt === maxNoAttemptsItemFetch) 
       throw new Error(
         `Failed to get song ${playlistItem.track.name} ${playlistItem.track.artists[0].name} from playlist. Please try the command again`
       );
-    await doEnqueueSpotifyPlaylistItem(playlistItem, attempt + 1);
+    await doEnqueueSpotifyPlaylistItem(playlistItem, memberId, attempt + 1);
   }
 }
 
-const enqueueSpotifyAlbumItems = async (albumId: string) => {
+const enqueueSpotifyAlbumItems = async (albumId: string, memberId: string) => {
   try {
     var albumItems = await axios.get(`https://api.spotify.com/v1/albums/${albumId}/track`, {
       headers: {
@@ -188,7 +188,7 @@ const enqueueSpotifyAlbumItems = async (albumId: string) => {
   do {
     const next = albumItems.data.next;
     albumItems.data.items.forEach(async (albumTrack) => {
-      await enqueueSpotifyAlbumItem(albumTrack);
+      await enqueueSpotifyAlbumItem(albumTrack, memberId);
     });
     albumItems = next === null
       ? undefined
@@ -208,11 +208,11 @@ const enqueueSpotifyAlbumItems = async (albumId: string) => {
   } while (albumItems !== null);
 }
 
-const enqueueSpotifyAlbumItem = async (albumItem) => {
-  await doEnqueueSpotifyAlbumItem(albumItem, 0);
+const enqueueSpotifyAlbumItem = async (albumItem, memberId: string) => {
+  await doEnqueueSpotifyAlbumItem(albumItem, memberId, 0);
 }
 
-const doEnqueueSpotifyAlbumItem = async (albumItem, attempt: number) => {
+const doEnqueueSpotifyAlbumItem = async (albumItem, memberId: string, attempt: number) => {
   try {
     // this is also EXPENSIVE....
     await axios
@@ -225,13 +225,13 @@ const doEnqueueSpotifyAlbumItem = async (albumItem, attempt: number) => {
           musicId: youtubeApiResponse.data.items[0].id.videoId,
           uploader: albumItem.artists[0].name,
           originalURL: albumItem.external_urls.spotify,
-        });      
+        }, memberId);      
       })
   } catch (error) {
     if (attempt === maxNoAttemptsItemFetch) 
       throw new Error(
         `Failed to get song ${albumItem.name} ${albumItem.artists[0].name} from playlist. Please try the command again`
       );
-    await doEnqueueSpotifyAlbumItem(albumItem, attempt + 1);    
+    await doEnqueueSpotifyAlbumItem(albumItem, memberId, attempt + 1);    
   }
 }
