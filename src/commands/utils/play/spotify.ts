@@ -96,6 +96,8 @@ export const enqueueSpotifyTrackRequest = async (url: string, embed: EmbedBuilde
     musicId: youtubeVideoInfo.data.items[0].id.videoId,
     uploader: spotifyTrackInfo.data.album.artists[0].name,
     originalURL: url,
+    enqueuerMemberId: memberId,
+    enqueueTimestamp: Date.now(),
   }, memberId);
 
   return embed
@@ -160,6 +162,8 @@ const doEnqueueSpotifyPlaylistItem = async (playlistItem, memberId: string, atte
           musicId: youtubeApiResponse.data.items[0].id.videoId,
           uploader: playlistItem.track.artists[0].name,
           originalURL: playlistItem.track.external_urls.spotify,
+          enqueuerMemberId: memberId,
+          enqueueTimestamp: Date.now(),
         }, memberId);
       });
   } catch (error) {
@@ -225,6 +229,8 @@ const doEnqueueSpotifyAlbumItem = async (albumItem, memberId: string, attempt: n
           musicId: youtubeApiResponse.data.items[0].id.videoId,
           uploader: albumItem.artists[0].name,
           originalURL: albumItem.external_urls.spotify,
+          enqueuerMemberId: memberId,
+          enqueueTimestamp: Date.now(),
         }, memberId);      
       })
   } catch (error) {

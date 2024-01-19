@@ -67,6 +67,8 @@ const enqueueMusicYouTubeNonURLQuery = async (query: string, embed: EmbedBuilder
           musicId: items[0].id.videoId,
           uploader: items[0].snippet.channelTitle,
           originalURL: `https://www.youtube.com/watch?v=${items[0].id.videoId}`,
+          enqueuerMemberId: memberId,
+          enqueueTimestamp: Date.now(),
         } : undefined;
       });
     

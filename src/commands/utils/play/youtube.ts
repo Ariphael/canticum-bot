@@ -73,7 +73,9 @@ export const enqueueYouTubeSongRequest = async (url: string, embed: EmbedBuilder
       musicTitle: videoInfo.items[0].snippet.title,
       musicId: musicId,
       uploader: videoInfo.items[0].snippet.channelTitle,
-      originalURL: url,      
+      originalURL: url,
+      enqueuerMemberId: memberId,
+      enqueueTimestamp: Date.now()     
     }, memberId);
 
     embed.setTitle(musicQueue.getLength() > 1 ? 'Added to Queue' : 'Now Playing')
@@ -98,7 +100,9 @@ const enqueuePlaylistItems = (playlistItems: AxiosResponse<any, any>, playlistId
       musicTitle: playlistItem.snippet.title,
       musicId: musicId,
       uploader: playlistItem.snippet.channelTitle,
-      originalURL: `https://www.youtube.com/watch?v=${musicId}&list=${playlistId}`
+      originalURL: `https://www.youtube.com/watch?v=${musicId}&list=${playlistId}`,
+      enqueuerMemberId: memberId,
+      enqueueTimestamp: Date.now(),
     }, memberId);
   });
 }
