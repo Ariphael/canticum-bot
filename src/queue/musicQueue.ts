@@ -6,12 +6,24 @@ const queue: MusicQueueItemType[] = [];
 export const musicQueue = {
   enqueue: async (musicQueueItem: MusicQueueItemType, memberId: string): Promise<number> => {
     await db.query(
-      `INSERT INTO enqueueHistory (title, uploader, originalURL, userId, enqueueTimestamp) VALUES (?, ?, ?, ?, ?)`,
-      [musicQueueItem.musicTitle, musicQueueItem.uploader, musicQueueItem.originalURL, memberId, 'NOW()']);
+      `INSERT INTO enqueue_history (title, uploader, originalURL, userId, enqueueTimestamp) VALUES (?, ?, ?, ?, NOW())`,
+      [musicQueueItem.musicTitle, musicQueueItem.uploader, musicQueueItem.originalURL, memberId]);
     return queue.push(musicQueueItem);
   },
-  dequeue: (): MusicQueueItemType | undefined => {
-    return queue.shift();
+  dequeue: async (): Promise<MusicQueueItemType | undefined> => {
+    const musicItem = queue.shift();
+    const enqueueTimestamp = 
+      new Date(musicItem.enqueueTimestamp).toISOString().slice(0, 19).replace('T', ' ');
+    const enqueueHistoryIdQueryResult = await db.query(
+      `SELECT id FROM enqueue_history WHERE title = ? AND uploader = ? AND originalURL = ? AND userId = ? AND enqueueTimestamp = ? LIMIT 1`,
+      [musicItem.musicTitle, musicItem.uploader, musicItem.originalURL, musicItem.enqueuerMemberId, 
+        enqueueTimestamp]
+    );
+    await db.query(
+      `INSERT INTO dequeue_history (playTimestamp, enqueueHistoryId) VALUES (NOW(), ?)`,
+      [enqueueHistoryIdQueryResult[0].id]
+    );
+    return musicItem;
   },
   swapQueuePositions: (positionA: number, positionB: number): boolean => {
     if (positionA <= 0 || positionB <= 0) {
