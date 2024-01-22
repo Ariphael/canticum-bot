@@ -10,7 +10,7 @@ const invalidYouTubePlaylistIDErrorStr =
 const emptyYouTubePlaylistURLErrorStr = 'Empty YouTube playlist URL';
 const apiErrorStr = 'YouTube api error';
 
-export const createPlaylistItemsArrayFromYouTubePlaylist = async (youtubePlaylistURL: string) => {
+export const createPlaylistItemsArrayFromYouTubePlaylist = async (youtubePlaylistURL: string, memberId: string) => {
   const playlistId = new URL(youtubePlaylistURL).searchParams.get('list');
   const playlistItemArray: Array<PlaylistItem> = [];
   var playlistItems: AxiosResponse<any, any>;
@@ -40,6 +40,7 @@ export const createPlaylistItemsArrayFromYouTubePlaylist = async (youtubePlaylis
         uploader: playlistItem.snippet.channelTitle,
         originalURL: `https://www.youtube.com/watch?v=${musicId}&list=${playlistId}`,
         dateCreated: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        enqueuerMemberId: memberId,
       });
     });
 
