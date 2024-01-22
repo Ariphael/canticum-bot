@@ -7,7 +7,7 @@ export const executePlaylistImport = async (interaction: ChatInputCommandInterac
   const targetPlaylistName = interaction.options.get('name').value as string;
   const url = interaction.options.get('url').value as string;
   const playlistInfo = await getYouTubePlaylistNameAndItemCount(url);
-  const playlistItems = await createPlaylistItemsArrayFromYouTubePlaylist(url);
+  const playlistItems = await createPlaylistItemsArrayFromYouTubePlaylist(url, memberId);
 
   var initialSizeOfPlaylist = await getNumberOfPlaylistItems(memberId, targetPlaylistName);
 
