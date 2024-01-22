@@ -22,8 +22,8 @@ class AudioResourceNormalState implements AudioResourceState {
     this.resourceVolume = 0.5;
   }
 
-  public playAudio(audioPlayer: AudioPlayer): boolean {
-    return this.doPlayAudio(audioPlayer);
+  public async playAudio(audioPlayer: AudioPlayer): Promise<boolean> {
+    return await this.doPlayAudio(audioPlayer);
   }
 
   public getCurrentPlayingSongInfo(): MusicQueueItemType | undefined {
@@ -56,9 +56,9 @@ class AudioResourceNormalState implements AudioResourceState {
     return this.resourceVolume;
   }
 
-  private doPlayAudio(audioPlayer: AudioPlayer) {
+  private async doPlayAudio(audioPlayer: AudioPlayer) {
     const nextMusicQueueItem = this.currentPlayingMusicQueueItem === undefined
-      ? musicQueue.dequeue()
+      ? await musicQueue.dequeue()
       : this.currentPlayingMusicQueueItem;
 
     if (nextMusicQueueItem !== undefined) {

@@ -19,9 +19,9 @@ class AudioResourceLoopQueueState implements AudioResourceState {
     this.resourceVolume = 0.5;
   }
 
-  public playAudio(audioPlayer: AudioPlayer): boolean {
+  public async playAudio(audioPlayer: AudioPlayer): Promise<boolean> {
     return this.doPlayAudio(audioPlayer);
-  };
+  }
 
   public getCurrentPlayingSongInfo(): MusicQueueItemType | undefined {
     return this.currentPlayingMusicQueueItem;
@@ -63,7 +63,7 @@ class AudioResourceLoopQueueState implements AudioResourceState {
       }
       this.currentPlayingMusicQueueItem = nextMusicQueueItem.value;
     }
-    
+
     const audioStream = 
       ytdl(`https://www.youtube.com/watch?v=${this.currentPlayingMusicQueueItem!.musicId}`, {
         filter: 'audioonly',

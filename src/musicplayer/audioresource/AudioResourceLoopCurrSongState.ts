@@ -22,7 +22,7 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
     this.resourceVolume = 0.5;
   }
 
-  public playAudio(audioPlayer: AudioPlayer): boolean {
+  public async playAudio(audioPlayer: AudioPlayer): Promise<boolean> {
     return this.doPlayAudio(audioPlayer);
   };
 
@@ -54,9 +54,9 @@ class AudioResourceLoopCurrSongState implements AudioResourceState {
     });  
   }
 
-  private doPlayAudio(audioPlayer: AudioPlayer): boolean {
+  private async doPlayAudio(audioPlayer: AudioPlayer): Promise<boolean> {
     const nextMusicQueueItem = this.currentPlayingMusicQueueItem === undefined
-      ? this.currentPlayingMusicQueueItem = musicQueue.dequeue()
+      ? this.currentPlayingMusicQueueItem = await musicQueue.dequeue()
       : this.currentPlayingMusicQueueItem;
       
     this.audioResource = createAudioResource(

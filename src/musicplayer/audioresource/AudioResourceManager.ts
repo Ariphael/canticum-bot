@@ -20,7 +20,7 @@ class AudioResourceManager {
     this.audioResourceState = this.audioResourceNormalState;
   }
 
-  public playAudio(audioPlayer: AudioPlayer): boolean {
+  public async playAudio(audioPlayer: AudioPlayer): Promise<boolean> {
     this.audioResourceState.setAudioPlayerStatusIdleListener(audioPlayer);
     return this.audioResourceState.playAudio(audioPlayer);
   }
