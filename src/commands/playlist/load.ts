@@ -63,6 +63,8 @@ const loadPlaylistToQueue = async (
       musicId: playlistItem.musicId,
       uploader: playlistItem.uploader,
       originalURL: playlistItem.originalURL,
+      enqueuerMemberId: memberId,
+      enqueueTimestamp: Date.now(),
     }, memberId);
   });
   return true;
