@@ -28,7 +28,7 @@ export const executePlaylistAddItem = async (interaction: ChatInputCommandIntera
 
   try {
     await db.query('START TRANSACTION');
-    const playlistItem = await createPlaylistItem(query);
+    const playlistItem = await createPlaylistItem(query, memberId);
     await insertPlaylistItemIntoDBIfUnique(playlistItem);
     addItemToUserPlaylist(memberId, playlistName, playlistItem, positionInPlaylist);
     embed.setTitle('Playlist')
