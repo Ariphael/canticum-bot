@@ -9,15 +9,15 @@ const invalidYouTubeVideoURLErrorStr =
 const failedYouTubeMusicQueryErrorStr = 'No song found associated with query';
 const apiErrorStr = 'YouTube API error';
 
-export const createPlaylistItem = async (query: string) => {
+export const createPlaylistItem = async (query: string, memberId: string) => {
   const isQueryYouTubeURL = youtubeURLRegExp.test(query);
 
   return isQueryYouTubeURL 
-    ? await createPlaylistItemURLQuery(query) 
-    : await createPlaylistItemNonURLQuery(query);
+    ? await createPlaylistItemURLQuery(query, memberId) 
+    : await createPlaylistItemNonURLQuery(query, memberId);
 }
 
-const createPlaylistItemURLQuery = async (url: string): Promise<PlaylistItem> => {
+const createPlaylistItemURLQuery = async (url: string, memberId: string): Promise<PlaylistItem> => {
   const musicId = new URL(url).searchParams.get('v');
 
   try {
@@ -31,6 +31,7 @@ const createPlaylistItemURLQuery = async (url: string): Promise<PlaylistItem> =>
       uploader: videoInfo.items[0].snippet.channelTitle,
       originalURL: url,  
       dateCreated: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      enqueuerMemberId: memberId,
     };
   } catch (reason) {
     if (reason.response) {
@@ -42,7 +43,7 @@ const createPlaylistItemURLQuery = async (url: string): Promise<PlaylistItem> =>
   }
 }
 
-const createPlaylistItemNonURLQuery = async (nonURLQuery: string): Promise<PlaylistItem> => {
+const createPlaylistItemNonURLQuery = async (nonURLQuery: string, memberId: string): Promise<PlaylistItem> => {
   try {
     return await axios
       .get(
@@ -55,6 +56,7 @@ const createPlaylistItemNonURLQuery = async (nonURLQuery: string): Promise<Playl
           uploader: items[0].snippet.channelTitle,
           originalURL: `https://www.youtube.com/watch?v=${items[0].id.videoId}`,
           dateCreated: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          enqueuerMemberId: memberId,
         } : undefined;
       });
   } catch (error) {
