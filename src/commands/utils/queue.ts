@@ -71,13 +71,8 @@ const enqueueMusicYouTubeNonURLQuery = async (query: string, embed: EmbedBuilder
           enqueueTimestamp: Date.now(),
         } : undefined;
       });
-    
+
     const newQueueLength = await musicQueue.enqueue(videoInfo, memberId);
-    
-    await db.query(
-      `INSERT INTO enqueueHistory (title, uploader, originalURL, userId, enqueueTimestamp) VALUES (?, ?, ?, ?, ?)`,
-      [videoInfo.musicTitle, videoInfo.uploader, videoInfo.originalURL, 'NOW()']
-    );
 
     return embed.setTitle(newQueueLength > 1 ? 'Added to Queue' : 'Now Playing')
       .setDescription(videoInfo.musicTitle)
