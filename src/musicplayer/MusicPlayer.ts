@@ -27,10 +27,10 @@ class MusicPlayer {
     this.paused = false;
   }
 
-  public playAudio(): boolean {
-    return this.audioResourceManager.playAudio(this.audioPlayer);
+  public async playAudio(): Promise<boolean> {
+    return await this.audioResourceManager.playAudio(this.audioPlayer);
   }
-  
+
   public stopAudioPlayer(): boolean {
     this.audioResourceManager.clearCachedMusicQueueItem();
     return this.audioPlayer.stop();
