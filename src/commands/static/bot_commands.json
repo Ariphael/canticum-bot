@@ -125,6 +125,27 @@
       "inline": true
     }]
   },
+  "remove item": {
+    "title": "remove item [position]",
+    "description": "remove a specific item from the queue. Parameters:",
+    "fields": [{
+      "name": "position",
+      "value": "position of song in the queue to remove..",
+      "inline": true
+    }]
+  },
+  "remove range": {
+    "title": "remove range [start] [end]",
+    "description": "removes a specified range of items from the queue. Parameters:",
+    "fields": [{
+      "name": "start",
+      "value": "(INCLUSIVE) start queue position value",
+      "inline": true
+    }, {
+      "name": "end",
+      "value": "(INCLUSIVE) end queue position value."
+    }]
+  },
   "shuffle": {
     "title": "shuffle",
     "value": "Randomises the queue using Fisher-Yates Shuffle algorithm"
@@ -141,6 +162,19 @@
       "value": "Skips to next song in queue",
       "inline": true
     }]
+  },
+  "skip to": {
+    "title": "skip to [position]",
+    "description": "Skips to specified position in queue and dequeues all items up to the specified position. Parameters: ",
+    "fields": [{
+      "name": "position",
+      "description": "position in queue to skip to. Use /queue to see state of queue and valid positions.",
+      "inline": true
+    }]
+  },
+  "skip next": {
+    "title": "skip next",
+    "description": "Skips to next song in queue. No parameters."
   },
   "swap": {
     "title": "swap [pos1] [pos2]",
@@ -164,7 +198,7 @@
   },
   "history": {
     "title": "history [subcommand]",
-    "description": "Displays history of songs played. Available subcommands:",
+    "description": "Displays history of songs played or enqueued. Available subcommands:",
     "fields": [{
       "name": "play",
       "value": "show history of songs played",
@@ -173,9 +207,31 @@
       "name": "queue",
       "value": "show history of songs enqueued",
       "inline": true
+    }]
+  },
+  "history play": {
+    "title": "history play (page) (personal)",
+    "description": "Displays history of songs played. 5 results per page. Parameters: ",
+    "fields": [{
+      "name": "page",
+      "value": "Page number. Must be a positive integer between 1 and the highest page number. Default value is 1.",
+      "inline": true
     }, {
       "name": "personal",
-      "value": "show history of songs issuer of command enqueued",
+      "value": "Boolean flag. If set to true, command displays history of songs played that were enqueued by the issuer of the command. Default value is zero.",
+      "inline": true
+    }]
+  }, 
+  "history queue": {
+    "title": "history queue (page) (personal)",
+    "description": "Displays history of songs enqueued. 5 results per page. Parameters: ",
+    "fields": [{
+      "name": "page",
+      "value": "Page number. Must be a positive integer between 1 and the highest page number. Default value is 1.",
+      "inline": true
+    }, {
+      "name": "personal",
+      "value": "Boolean flag. If set to true, command displays history of songs enqueued by the issuer of the command. Default value is false.",
       "inline": true
     }]
   }
