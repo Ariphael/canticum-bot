@@ -75,7 +75,7 @@ export const enqueueYouTubeSongRequest = async (url: string, embed: EmbedBuilder
       uploader: videoInfo.items[0].snippet.channelTitle,
       originalURL: url,
       enqueuerMemberId: memberId,
-      enqueueTimestamp: Date.now()     
+      enqueueTimestamp: Date.now()
     }, memberId);
 
     embed.setTitle(musicQueue.getLength() > 1 ? 'Added to Queue' : 'Now Playing')
