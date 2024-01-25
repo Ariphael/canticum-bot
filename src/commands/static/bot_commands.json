@@ -30,17 +30,37 @@
     "description": "Loops current playing song or through queue. Available subcommands:",
     "fields": [{
       "name": "currsong",
-      "value": "loop the current playing song",
+      "value": "Loop the current playing song",
       "inline": true
     }, {
       "name": "queue",
-      "value": "loop the queue with dequeuing operation disabled when /skip is used",
+      "value": "Loop the queue with dequeuing operations disabled",
       "inline": true
     }, {
       "name": "off",
-      "value": "turns off looping (enables default dequeuing operations)",
+      "value": "Turns off looping (enables default dequeuing operations)",
       "inline": true
     }]
+  },
+  "loop currsong": {
+    "title": "loop currsong",
+    "value": "Loops the current playing song",
+    "inline": true
+  },
+  "loop queue": {
+    "title": "loop queue (append)",
+    "value": "Loop the queue with dequeuing operations disabled (/skip does not dequeue). Parameters: ",
+    "fields": [{
+      "name": "append",
+      "value": "If set to true, appends the current playing song (if any) to the queue as it has been dequeued. Default value is false.",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "loop off": {
+    "title": "loop off",
+    "value": "Turns looping off",
+    "inline": true
   },
   "nowplaying": {
     "title": "nowplaying",
@@ -102,6 +122,115 @@
       "value": "delete a personal playlist",
       "inline": true
     }]
+  },
+  "playlist import": {
+    "title": "playlist import [name] [url]",
+    "value": "Imports the content of a youtube playlist into a new personal playlist with a given name. Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "name to identify the new personal playlist",
+      "inline": true
+    }, {
+      "name": "url",
+      "value": "Youtube url of playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist info": {
+    "title": "playlist info [name] (page)",
+    "value": "View the content of a specific personal playlist (5 results/page). Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "Name of personal playlist",
+      "inline": true
+    }, {
+      "name": "page",
+      "value": "Page number. Default value is 1.",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist additem": {
+    "title": "playlist additem [name] [query] (position)",
+    "value": "Add an item to the end or at a specified position of a personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of existing personal playlist",
+      "inline": true
+    }, {
+      "name": "query",
+      "value": "Youtube url or song name",
+      "inline": true
+    }, {
+      "name": "position",
+      "value": "Position in the personal playlist to insert the new item. If not specified, the item is appended to the playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist removeitem": {
+    "title": "playlist removeitem [name] [position]",
+    "value": "Removes an item from a specified personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of personal playlist",
+      "inline": true
+    }, {
+      "name": "position",
+      "value": "Position of item to remove in playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist load": {
+    "title": "playlist load [name]",
+    "value": "Appends content of a specified personal playlist to the music queue. Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "Name of personal playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist view": {
+    "title": "playlist view",
+    "value": "Displays personal playlists created by issuer of command.",
+    "inline": true
+  },
+  "playlist create": {
+    "title": "playlist create [name]",
+    "value": "Creates a new personal playlist not visible and accessible by other members. Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "Unique name of new playlist.",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist rename": {
+    "title": "playlist rename [name] [newname]",
+    "value": "Renames existing personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of existing playlist",
+      "inline": true
+    }, {
+      "name": "newname",
+      "value": "New unique name for existing playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist delete": {
+    "title": "playlist delete [name]",
+    "value": "Delete an existing personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of existing playlist to delete",
+      "inline": true
+    }],
+    "inline": true
   },
   "queue": {
     "title": "queue (pagenumber)",
