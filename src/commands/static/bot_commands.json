@@ -90,7 +90,7 @@
       "value": "import a playlist from youtube",
       "inline": true
     }, {
-      "name": "info",
+      "name": "content",
       "value": "display content of specific playlist",
       "inline": true
     }, {
@@ -137,8 +137,8 @@
     }],
     "inline": true
   },
-  "playlist info": {
-    "title": "playlist info [name] (page)",
+  "playlist content": {
+    "title": "playlist content [name] (page)",
     "value": "View the content of a specific personal playlist (5 results/page). Parameters: ",
     "fields": [{
       "name": "name",

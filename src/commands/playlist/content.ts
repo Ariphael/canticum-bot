@@ -3,7 +3,7 @@ import * as db from '../../utils/database';
 
 const resultsPerPage = 5;
 
-export const executePlaylistInfo = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
+export const executePlaylistContent = async (interaction: ChatInputCommandInteraction<CacheType>, embed: EmbedBuilder) => {
   const memberId = interaction.member.user.id;
   const playlistName = interaction.options.get('name').value as string;
 
@@ -18,7 +18,7 @@ export const executePlaylistInfo = async (interaction: ChatInputCommandInteracti
         .setDescription(`No playlist with name "${playlistName}" was found`);
       return interaction.reply({ content: '', components: [], embeds: [embed] });
     }
-    await doExecutePlaylistInfo(interaction, embed, memberId, playlistName);
+    await doExecutePlaylistContent(interaction, embed, memberId, playlistName);
   } catch (error) {
     console.error(`Transaction error: ${error}`);
     embed.setTitle('Error')
@@ -28,7 +28,7 @@ export const executePlaylistInfo = async (interaction: ChatInputCommandInteracti
   }
 }
 
-const doExecutePlaylistInfo = async (
+const doExecutePlaylistContent = async (
   interaction: ChatInputCommandInteraction<CacheType>, 
   embed: EmbedBuilder, 
   memberId: string, 
