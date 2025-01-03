@@ -2,22 +2,22 @@
   "help": {
     "title": "help (command)",
     "description": "Displays list of commands or information about specific command. Parameters:",
-    "values": [{
+    "fields": [{
       "name": "command",
-      "description": "name of command. (Eg. connect, queue, skip, skip to)",
+      "value": "name of command. (Eg. connect, queue, skip, skip to)",
       "inline": true
     }]
   },
   "clear": {
     "title": "clear",
-    "description": "Clears queue"
+    "description": "Clears queue. No parameters."
   },
   "connect": {
     "title": "connect [voicechannel]",
     "description": "Connects/migrates to another voice channel. Does not destroy the underlying audio resource. Parameters:",
     "fields": [{
       "name": "voicechannel",
-      "description": "Target guild voice channel",
+      "value": "Target guild voice channel",
       "inline": true
     }]
   },
@@ -44,12 +44,12 @@
   },
   "loop currsong": {
     "title": "loop currsong",
-    "value": "Loops the current playing song",
+    "description": "Loops the current playing song",
     "inline": true
   },
   "loop queue": {
     "title": "loop queue (append)",
-    "value": "Loop the queue with dequeuing operations disabled (/skip does not dequeue). Parameters: ",
+    "description": "Loop the queue with dequeuing operations disabled (/skip does not dequeue). Parameters: ",
     "fields": [{
       "name": "append",
       "value": "If set to true, appends the current playing song (if any) to the queue as it has been dequeued. Default value is false.",
@@ -59,7 +59,7 @@
   },
   "loop off": {
     "title": "loop off",
-    "value": "Turns looping off",
+    "description": "Turns looping off",
     "inline": true
   },
   "nowplaying": {
@@ -107,7 +107,7 @@
       "inline": true
     }, {
       "name": "view",
-      "value": "show all personal playlists",
+      "value": "show command issuer's personal playlists",
       "inline": true
     }, {
       "name": "create",
@@ -125,10 +125,10 @@
   },
   "playlist import": {
     "title": "playlist import [name] [url]",
-    "value": "Imports the content of a youtube playlist into a new personal playlist with a given name. Parameters: ",
+    "description": "Imports the content of a youtube playlist into a new personal playlist. Parameters: ",
     "fields": [{
       "name": "name",
-      "value": "name to identify the new personal playlist",
+      "value": "Name of new personal playlist",
       "inline": true
     }, {
       "name": "url",
@@ -139,7 +139,7 @@
   },
   "playlist content": {
     "title": "playlist content [name] (page)",
-    "value": "View the content of a specific personal playlist (5 results/page). Parameters: ",
+    "description": "View the content of a specific personal playlist (5 results/page). Parameters: ",
     "fields": [{
       "name": "name",
       "value": "Name of personal playlist",
@@ -153,7 +153,7 @@
   },
   "playlist additem": {
     "title": "playlist additem [name] [query] (position)",
-    "value": "Add an item to the end or at a specified position of a personal playlist. Parameters:",
+    "description": "Add an item to the end or at a specified position of a personal playlist. Parameters:",
     "fields": [{
       "name": "name",
       "value": "Name of existing personal playlist",
@@ -164,14 +164,14 @@
       "inline": true
     }, {
       "name": "position",
-      "value": "Position in the personal playlist to insert the new item. If not specified, the item is appended to the playlist",
+      "value": "Position in the personal playlist to insert the new item. If not specified, the item is appended to the end of the playlist",
       "inline": true
     }],
     "inline": true
   },
   "playlist removeitem": {
     "title": "playlist removeitem [name] [position]",
-    "value": "Removes an item from a specified personal playlist. Parameters:",
+    "description": "Removes an item from a specified personal playlist. Parameters:",
     "fields": [{
       "name": "name",
       "value": "Name of personal playlist",
@@ -185,7 +185,7 @@
   },
   "playlist load": {
     "title": "playlist load [name]",
-    "value": "Appends content of a specified personal playlist to the music queue. Parameters: ",
+    "description": "Appends content of a specified personal playlist to the music queue. Parameters: ",
     "fields": [{
       "name": "name",
       "value": "Name of personal playlist",
@@ -195,12 +195,12 @@
   },
   "playlist view": {
     "title": "playlist view",
-    "value": "Displays personal playlists created by issuer of command.",
+    "description": "Displays personal playlists created by issuer of command. No parameters.",
     "inline": true
   },
   "playlist create": {
     "title": "playlist create [name]",
-    "value": "Creates a new personal playlist not visible and accessible by other members. Parameters: ",
+    "description": "Creates a new personal playlist not visible and accessible by other members. Parameters: ",
     "fields": [{
       "name": "name",
       "value": "Unique name of new playlist.",
@@ -210,7 +210,7 @@
   },
   "playlist rename": {
     "title": "playlist rename [name] [newname]",
-    "value": "Renames existing personal playlist. Parameters:",
+    "description": "Renames existing personal playlist. Parameters:",
     "fields": [{
       "name": "name",
       "value": "Name of existing playlist",
@@ -224,7 +224,7 @@
   },
   "playlist delete": {
     "title": "playlist delete [name]",
-    "value": "Delete an existing personal playlist. Parameters:",
+    "description": "Delete an existing personal playlist. Parameters:",
     "fields": [{
       "name": "name",
       "value": "Name of existing playlist to delete",
@@ -277,7 +277,7 @@
   },
   "shuffle": {
     "title": "shuffle",
-    "value": "Randomises the queue using Fisher-Yates Shuffle algorithm"
+    "value": "Randomises the queue using Fisher-Yates Shuffle algorithm. No parameters."
   },
   "skip": {
     "title": "skip [subcommand]",
@@ -315,7 +315,7 @@
   },
   "unpause": {
     "title": "unpause",
-    "value": "Unpauses playback of audio resource"
+    "value": "Unpauses playback of audio resource. No parameters."
   },
   "volume": {
     "title": "volume [vol]",

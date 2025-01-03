@@ -1,0 +1,25 @@
+services:
+  app:
+    image: node:20.5.1
+    command: sh -c "npm install && npm run start"
+    ports:
+      - 127.0.0.1:3000:3000
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_DB: canticum
+  mysql:
+    image: mysql-image
+    restart: always
+    volumes:
+      - canticum-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_DATABASE: canticum
+
+volumes:
+  canticum-mysql-data:

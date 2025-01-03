@@ -2,7 +2,6 @@ import * as db from '../../utils/database';
 import axios, { AxiosResponse } from 'axios';
 import { EmbedBuilder } from 'discord.js';
 import { musicQueue } from '../../queue/musicQueue';
-import { spotifyAccessToken } from '../../../config/spotify.json';
 import { 
   enqueueSpotifyAlbumRequest, 
   enqueueSpotifyPlaylistRequest, 

@@ -32,7 +32,7 @@ export const exit = async () => (await connection).end().catch((endError) => {
 });
 
 const isRowDataPacket = (rows: QueryCallbackResultBaseType): rows is mysql.RowDataPacket[] => {
-  return Array.isArray(rows) 
-    && !rows.every(Array.isArray) 
-    && rows.every(row => rows.constructor.name !== 'ResultSetHeader');
+  if (!Array.isArray(rows) || rows.length === 0)
+    return false;
+  return rows.some(row => !Array.isArray(row) && row.constructor.name == 'RowDataPacket');
 }
