@@ -19,7 +19,7 @@
 -- Table structure for table `dequeue_history`
 --
 
-CREATE DATABASE canticum;
+CREATE DATABASE IF NOT EXISTS canticum;
 USE canticum;
 
 DROP TABLE IF EXISTS `dequeue_history`;
