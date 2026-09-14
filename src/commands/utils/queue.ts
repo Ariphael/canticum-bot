@@ -1,7 +1,7 @@
+import * as db from '../../utils/database';
 import axios, { AxiosResponse } from 'axios';
 import { EmbedBuilder } from 'discord.js';
 import { musicQueue } from '../../queue/musicQueue';
-import { spotifyAccessToken } from '../../../config/spotify.json';
 import { 
   enqueueSpotifyAlbumRequest, 
   enqueueSpotifyPlaylistRequest, 
@@ -20,43 +20,43 @@ const spotifyURLRegExp =
 
 const failedYouTubeMusicQueryErrorStr = 'No song found associated with query';
 
-export const enqueueMusicAndBuildEmbed = async (query: string, embed: EmbedBuilder) => {
+export const enqueueMusicAndBuildEmbed = async (query: string, embed: EmbedBuilder, memberId: string) => {
   const isQueryYouTubeURL = youtubeURLRegExp.test(query);
   const isQuerySpotifyURL = spotifyURLRegExp.test(query);
 
   return isQueryYouTubeURL
-    ? await enqueueMusicYouTube(query, embed)
+    ? await enqueueMusicYouTube(query, embed, memberId)
     : (isQuerySpotifyURL
-      ? await enqueueMusicSpotify(query, embed)
-      : await enqueueMusicYouTubeNonURLQuery(query, embed));
+      ? await enqueueMusicSpotify(query, embed, memberId)
+      : await enqueueMusicYouTubeNonURLQuery(query, embed, memberId));
 }
 
-const enqueueMusicYouTube = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
+const enqueueMusicYouTube = async (url: string, embed: EmbedBuilder, memberId: string): Promise<EmbedBuilder> => {
   const includesPlaylistId = url.includes('list=');
 
   if (includesPlaylistId) {
     // do this for enqueueyoutubesongrequest
-    return await enqueueYouTubePlaylistRequest(url, embed);
+    return await enqueueYouTubePlaylistRequest(url, embed, memberId);
   } else {
-    return await enqueueYouTubeSongRequest(url, embed);
+    return await enqueueYouTubeSongRequest(url, embed, memberId);
   }
 }
 
-const enqueueMusicSpotify = async (url: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
+const enqueueMusicSpotify = async (url: string, embed: EmbedBuilder, memberId: string): Promise<EmbedBuilder> => {
   const includesPlaylistId = url.includes('playlist/');
   const includesTrackId = url.includes('track/');
   const includesAlbumId = url.includes('album/');
 
   if (includesPlaylistId) {
-    return await enqueueSpotifyPlaylistRequest(url, embed);
+    return await enqueueSpotifyPlaylistRequest(url, embed, memberId);
   } else if (includesTrackId) {
-    return await enqueueSpotifyTrackRequest(url, embed);
+    return await enqueueSpotifyTrackRequest(url, embed, memberId);
   } else if (includesAlbumId) {
-    return await enqueueSpotifyAlbumRequest(url, embed);
+    return await enqueueSpotifyAlbumRequest(url, embed, memberId);
   }
 }
 
-const enqueueMusicYouTubeNonURLQuery = async (query: string, embed: EmbedBuilder): Promise<EmbedBuilder> => {
+const enqueueMusicYouTubeNonURLQuery = async (query: string, embed: EmbedBuilder, memberId: string): Promise<EmbedBuilder> => {
   try {
     const videoInfo = await axios
       .get(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${query}&key=${process.env.YOUTUBE_API_KEY}`)
@@ -66,10 +66,12 @@ const enqueueMusicYouTubeNonURLQuery = async (query: string, embed: EmbedBuilder
           musicId: items[0].id.videoId,
           uploader: items[0].snippet.channelTitle,
           originalURL: `https://www.youtube.com/watch?v=${items[0].id.videoId}`,
+          enqueuerMemberId: memberId,
+          enqueueTimestamp: Date.now(),
         } : undefined;
       });
-    
-    const newQueueLength = musicQueue.enqueue(videoInfo);
+
+    const newQueueLength = await musicQueue.enqueue(videoInfo, memberId);
 
     return embed.setTitle(newQueueLength > 1 ? 'Added to Queue' : 'Now Playing')
       .setDescription(videoInfo.musicTitle)

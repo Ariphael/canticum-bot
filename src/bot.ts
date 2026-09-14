@@ -55,6 +55,6 @@ const setupCleanupActionOnExit = () => {
     db.exit();
     process.exit();
   });
-}
+};
 
 startCanticum(client);

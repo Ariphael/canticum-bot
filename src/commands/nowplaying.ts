@@ -27,10 +27,11 @@ const executeNowPlaying = async (client: Client, interaction: ChatInputCommandIn
       embeds: [embed],
       ephemeral: true,
     });
-  } else if (!musicPlayerInstance.isPlayingAudio()) {
+  } else if (!musicPlayerInstance.isAudioResourcePlayable()) {
     embed.setTitle('Error')
-      .setDescription('There is no resource associated with the music player. Use /play to create'
-        + ' a resource and add a song to the queue.');
+      .setDescription(
+        'There is no resource associated with the music player that is playable. Either the resource is buffering or there is no resource. Use /play to create a resource and add a song to the queue.'
+      );
     await interaction.reply({
       content: '',
       components: [],

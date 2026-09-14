@@ -2,22 +2,22 @@
   "help": {
     "title": "help (command)",
     "description": "Displays list of commands or information about specific command. Parameters:",
-    "values": [{
+    "fields": [{
       "name": "command",
-      "description": "name of command. (Eg. connect, queue, skip, skip to)",
+      "value": "name of command. (Eg. connect, queue, skip, skip to)",
       "inline": true
     }]
   },
   "clear": {
     "title": "clear",
-    "description": "Clears queue"
+    "description": "Clears queue. No parameters."
   },
   "connect": {
     "title": "connect [voicechannel]",
     "description": "Connects/migrates to another voice channel. Does not destroy the underlying audio resource. Parameters:",
     "fields": [{
       "name": "voicechannel",
-      "description": "Target guild voice channel",
+      "value": "Target guild voice channel",
       "inline": true
     }]
   },
@@ -30,17 +30,37 @@
     "description": "Loops current playing song or through queue. Available subcommands:",
     "fields": [{
       "name": "currsong",
-      "value": "loop the current playing song",
+      "value": "Loop the current playing song",
       "inline": true
     }, {
       "name": "queue",
-      "value": "loop the queue with dequeuing operation disabled when /skip is used",
+      "value": "Loop the queue with dequeuing operations disabled",
       "inline": true
     }, {
       "name": "off",
-      "value": "turns off looping (enables default dequeuing operations)",
+      "value": "Turns off looping (enables default dequeuing operations)",
       "inline": true
     }]
+  },
+  "loop currsong": {
+    "title": "loop currsong",
+    "description": "Loops the current playing song",
+    "inline": true
+  },
+  "loop queue": {
+    "title": "loop queue (append)",
+    "description": "Loop the queue with dequeuing operations disabled (/skip does not dequeue). Parameters: ",
+    "fields": [{
+      "name": "append",
+      "value": "If set to true, appends the current playing song (if any) to the queue as it has been dequeued. Default value is false.",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "loop off": {
+    "title": "loop off",
+    "description": "Turns looping off",
+    "inline": true
   },
   "nowplaying": {
     "title": "nowplaying",
@@ -70,7 +90,7 @@
       "value": "import a playlist from youtube",
       "inline": true
     }, {
-      "name": "info",
+      "name": "content",
       "value": "display content of specific playlist",
       "inline": true
     }, {
@@ -87,7 +107,7 @@
       "inline": true
     }, {
       "name": "view",
-      "value": "show all personal playlists",
+      "value": "show command issuer's personal playlists",
       "inline": true
     }, {
       "name": "create",
@@ -102,6 +122,115 @@
       "value": "delete a personal playlist",
       "inline": true
     }]
+  },
+  "playlist import": {
+    "title": "playlist import [name] [url]",
+    "description": "Imports the content of a youtube playlist into a new personal playlist. Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "Name of new personal playlist",
+      "inline": true
+    }, {
+      "name": "url",
+      "value": "Youtube url of playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist content": {
+    "title": "playlist content [name] (page)",
+    "description": "View the content of a specific personal playlist (5 results/page). Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "Name of personal playlist",
+      "inline": true
+    }, {
+      "name": "page",
+      "value": "Page number. Default value is 1.",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist additem": {
+    "title": "playlist additem [name] [query] (position)",
+    "description": "Add an item to the end or at a specified position of a personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of existing personal playlist",
+      "inline": true
+    }, {
+      "name": "query",
+      "value": "Youtube url or song name",
+      "inline": true
+    }, {
+      "name": "position",
+      "value": "Position in the personal playlist to insert the new item. If not specified, the item is appended to the end of the playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist removeitem": {
+    "title": "playlist removeitem [name] [position]",
+    "description": "Removes an item from a specified personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of personal playlist",
+      "inline": true
+    }, {
+      "name": "position",
+      "value": "Position of item to remove in playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist load": {
+    "title": "playlist load [name]",
+    "description": "Appends content of a specified personal playlist to the music queue. Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "Name of personal playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist view": {
+    "title": "playlist view",
+    "description": "Displays personal playlists created by issuer of command. No parameters.",
+    "inline": true
+  },
+  "playlist create": {
+    "title": "playlist create [name]",
+    "description": "Creates a new personal playlist not visible and accessible by other members. Parameters: ",
+    "fields": [{
+      "name": "name",
+      "value": "Unique name of new playlist.",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist rename": {
+    "title": "playlist rename [name] [newname]",
+    "description": "Renames existing personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of existing playlist",
+      "inline": true
+    }, {
+      "name": "newname",
+      "value": "New unique name for existing playlist",
+      "inline": true
+    }],
+    "inline": true
+  },
+  "playlist delete": {
+    "title": "playlist delete [name]",
+    "description": "Delete an existing personal playlist. Parameters:",
+    "fields": [{
+      "name": "name",
+      "value": "Name of existing playlist to delete",
+      "inline": true
+    }],
+    "inline": true
   },
   "queue": {
     "title": "queue (pagenumber)",
@@ -125,9 +254,30 @@
       "inline": true
     }]
   },
+  "remove item": {
+    "title": "remove item [position]",
+    "description": "remove a specific item from the queue. Parameters:",
+    "fields": [{
+      "name": "position",
+      "value": "position of song in the queue to remove..",
+      "inline": true
+    }]
+  },
+  "remove range": {
+    "title": "remove range [start] [end]",
+    "description": "removes a specified range of items from the queue. Parameters:",
+    "fields": [{
+      "name": "start",
+      "value": "(INCLUSIVE) start queue position value",
+      "inline": true
+    }, {
+      "name": "end",
+      "value": "(INCLUSIVE) end queue position value."
+    }]
+  },
   "shuffle": {
     "title": "shuffle",
-    "value": "Randomises the queue using Fisher-Yates Shuffle algorithm"
+    "value": "Randomises the queue using Fisher-Yates Shuffle algorithm. No parameters."
   },
   "skip": {
     "title": "skip [subcommand]",
@@ -142,6 +292,19 @@
       "inline": true
     }]
   },
+  "skip to": {
+    "title": "skip to [position]",
+    "description": "Skips to specified position in queue and dequeues all items up to the specified position. Parameters: ",
+    "fields": [{
+      "name": "position",
+      "description": "position in queue to skip to. Use /queue to see state of queue and valid positions.",
+      "inline": true
+    }]
+  },
+  "skip next": {
+    "title": "skip next",
+    "description": "Skips to next song in queue. No parameters."
+  },
   "swap": {
     "title": "swap [pos1] [pos2]",
     "value": "Swaps two items in the queue. Parameters: ",
@@ -152,7 +315,7 @@
   },
   "unpause": {
     "title": "unpause",
-    "value": "Unpauses playback of audio resource"
+    "value": "Unpauses playback of audio resource. No parameters."
   },
   "volume": {
     "title": "volume [vol]",
@@ -164,7 +327,7 @@
   },
   "history": {
     "title": "history [subcommand]",
-    "description": "Displays history of songs played. Available subcommands:",
+    "description": "Displays history of songs played or enqueued. Available subcommands:",
     "fields": [{
       "name": "play",
       "value": "show history of songs played",
@@ -173,9 +336,31 @@
       "name": "queue",
       "value": "show history of songs enqueued",
       "inline": true
+    }]
+  },
+  "history play": {
+    "title": "history play (page) (personal)",
+    "description": "Displays history of songs played. 5 results per page. Parameters: ",
+    "fields": [{
+      "name": "page",
+      "value": "Page number. Must be a positive integer between 1 and the highest page number. Default value is 1.",
+      "inline": true
     }, {
       "name": "personal",
-      "value": "show history of songs issuer of command enqueued",
+      "value": "Boolean flag. If set to true, command displays history of songs played that were enqueued by the issuer of the command. Default value is zero.",
+      "inline": true
+    }]
+  }, 
+  "history queue": {
+    "title": "history queue (page) (personal)",
+    "description": "Displays history of songs enqueued. 5 results per page. Parameters: ",
+    "fields": [{
+      "name": "page",
+      "value": "Page number. Must be a positive integer between 1 and the highest page number. Default value is 1.",
+      "inline": true
+    }, {
+      "name": "personal",
+      "value": "Boolean flag. If set to true, command displays history of songs enqueued by the issuer of the command. Default value is false.",
       "inline": true
     }]
   }

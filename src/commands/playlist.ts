@@ -11,7 +11,7 @@ export const playlist: Command = {
     description: 'display playlists created by issuer of command'
   }, {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'info', 
+    name: 'content', 
     description: 'displays content of specific playlist',
     options: [{
       type: ApplicationCommandOptionType.String,
@@ -71,7 +71,7 @@ export const playlist: Command = {
     }, {
       type: ApplicationCommandOptionType.String,
       name: 'query',
-      description: 'youtube or spotify link or song name',
+      description: 'youtube url or song name',
       required: true,
     }, {
       type: ApplicationCommandOptionType.Integer, 

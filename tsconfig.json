@@ -5,8 +5,11 @@
       "noImplicitAny": false,
       "noEmit": false,
       "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "types": []
   },
   "exclude": [
     "**/**_broken.ts",
+    "node_modules"
   ]
 }

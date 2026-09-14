@@ -62,7 +62,7 @@ const executePlay = async (_client: Client, interaction: ChatInputCommandInterac
   // a substantial amount of time may be consumed by fetching items in a long playlist.
   await interaction.deferReply();
 
-  await enqueueMusicAndBuildEmbed(query, embed);
+  await enqueueMusicAndBuildEmbed(query, embed, interaction.user.id);
 
   if (musicQueueOldLength === 0 && !musicPlayerInstance.isPlayingAudio()) {
     musicPlayerInstance.playAudio();

@@ -31,6 +31,9 @@ const executeConnect = async (_client: Client, interaction: ChatInputCommandInte
     .setTitle('Connect');
   const connection = getVoiceConnection(interaction.guild!.id);
 
+  if (connection)
+    (connection as VoiceConnection).destroy();
+
   // requestedChannel and interaction.guild will never be null
   // @ts-ignore
   const requestedChannel: VoiceChannel = interaction.options.getChannel('channel')!;
@@ -40,9 +43,6 @@ const executeConnect = async (_client: Client, interaction: ChatInputCommandInte
     adapterCreator: interaction.guild!.voiceAdapterCreator,
   });
   const musicPlayerInstance = MusicPlayer.getMusicPlayerInstance();
-
-  if (connection)
-    (connection as VoiceConnection).destroy();
 
   musicPlayerInstance.addAudioPlayerToVoiceConnectionSubscriptions(voiceConnection);
   embed.setDescription(
