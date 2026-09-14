@@ -7,19 +7,32 @@ services:
     working_dir: /usr/src/app
     volumes:
       - ./:/usr/src/app
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
     environment:
       MYSQL_HOST: mysql
       MYSQL_USER: root
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DB: canticum
   mysql:
-    image: mysql-image
+    image: mysql:8.0
     restart: always
-    volumes:
-      - canticum-mysql-data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: canticum
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql:/docker-entrypoint-initdb.d
+      - canticum-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "-uroot", "-p${MYSQL_PASSWORD}",  "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   canticum-mysql-data:
